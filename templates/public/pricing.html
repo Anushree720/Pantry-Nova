@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Pricing — Pantry Nova{% endblock %}
+
+{% block body %}
+<header style="background: var(--pn-primary); padding: 18px 40px; position: sticky; top: 0; z-index: 100;">
+    <div style="display: flex; align-items: center; max-width: 1280px; margin: 0 auto;">
+        <a href="{% url 'landing' %}" style="display: flex; align-items: center; gap: 10px; color: #fff; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem;">
+            <span style="background: var(--pn-accent); width: 36px; height: 36px; border-radius: 12px 8px 8px 8px; display: inline-flex; align-items: center; justify-content: center;">🌿</span>
+            Pantry Nova
+        </a>
+        <nav style="margin-left: auto; display: flex; gap: 20px; align-items: center;">
+            <a href="{% url 'landing' %}" style="color: rgba(255,255,255,0.85);">Home</a>
+            <a href="{% url 'pricing' %}" style="color: var(--pn-accent); font-weight: 600;">Pricing</a>
+            <a href="{% url 'manager_login' %}" class="pn-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1.5px solid rgba(255,255,255,0.3);">Login</a>
+            <a href="{% url 'manager_register' %}" class="pn-btn pn-btn-accent">Get Started</a>
+        </nav>
+    </div>
+</header>
+
+<section class="pn-section" style="background: var(--pn-bg); padding-top: 60px;">
+    <div style="max-width: 1280px; margin: 0 auto; text-align: center;">
+        <div style="display:inline-block; background: rgba(82,183,136,0.15); color: var(--pn-accent); padding: 6px 16px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; margin-bottom: 18px;">
+            🌿 Simple, Transparent Pricing
+        </div>
+        <h1 class="pn-section-title">Pick Your Pantry Plan</h1>
+        <p class="pn-section-subtitle">Start free. Upgrade anytime. Save more money than you spend on the plan.</p>
+
+        <div style="display: inline-flex; background: var(--pn-card); border-radius: 999px; padding: 5px; margin-bottom: 40px; box-shadow: var(--pn-shadow);">
+            <a href="?cycle=monthly" class="pn-btn pn-btn-sm" style="border-radius: 999px; {% if cycle == 'monthly' %}background: var(--pn-primary); color: #fff;{% else %}background: transparent; color: var(--pn-text);{% endif %}">Monthly</a>
+            <a href="?cycle=yearly" class="pn-btn pn-btn-sm" style="border-radius: 999px; {% if cycle == 'yearly' %}background: var(--pn-primary); color: #fff;{% else %}background: transparent; color: var(--pn-text);{% endif %}">
+                Yearly <span style="background: var(--pn-accent); color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; margin-left: 4px;">Save 17%</span>
+            </a>
+        </div>
+
+        <div class="pn-grid pn-grid-3" style="text-align: left; align-items: stretch;">
+            {% for p in plans %}
+            <div class="pn-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00" style="display: flex; flex-direction: column; {% if p.slug == 'pro' %}border-top-color: var(--pn-accent); border-top-width: 6px; transform: scale(1.04); box-shadow: 0 16px 40px rgba(82,183,136,0.25);{% endif %}">
+                {% if p.slug == 'pro' %}
+                <div style="position: absolute; top: -12px; right: 24px; background: var(--pn-accent); color: #fff; padding: 4px 14px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">⭐ Most Popular</div>
+                {% endif %}
+
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="font-size: 1.4rem;">
+                        {% if p.slug == 'free' %}🌱{% elif p.slug == 'pro' %}🌿{% else %}🌳{% endif %}
+                    </span>
+                    <h3 style="margin: 0; font-size: 1.4rem;">{{ p.name }}</h3>
+                </div>
+                <p style="color: var(--pn-text-secondary); margin: 0 0 18px; min-height: 40px;">{{ p.tagline }}</p>
+
+                <div style="margin-bottom: 18px;">
+                    {% if p.is_free %}
+                        <div style="font-family: 'Syne'; font-size: 3rem; font-weight: 700; line-height: 1; color: var(--pn-primary);">₹0</div>
+                        <div style="color: var(--pn-text-secondary); font-size: 0.9rem;">Forever free</div>
+                    {% else %}
+                        <div style="display: flex; align-items: baseline; gap: 4px;">
+                            <span style="font-family: 'Syne'; font-size: 3rem; font-weight: 700; line-height: 1; color: var(--pn-primary);">
+                                ₹{% if cycle == 'yearly' %}{{ p.price_yearly }}{% else %}{{ p.price_monthly }}{% endif %}
+                            </span>
+                            <span style="color: var(--pn-text-secondary);">/{{ cycle|slice:":-2" }}</span>
+                        </div>
+                        {% if cycle == 'yearly' %}
+                            <div style="color: var(--pn-accent); font-size: 0.85rem; font-weight: 600;">
+                                Save ₹{{ p.yearly_savings }} ({{ p.yearly_savings_pct }}% off)
+                            </div>
+                        {% else %}
+                            <div style="color: var(--pn-text-secondary); font-size: 0.85rem;">
+                                or ₹{{ p.price_yearly }}/year
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="pn-divider"></div>
+
+                <ul style="list-style: none; padding: 0; margin: 0; flex: 1;">
+                    {% for f in p.feature_list %}
+                    <li style="padding: 8px 0; display: flex; align-items: center; gap: 10px;">
+                        <span style="color: var(--pn-accent); font-size: 1.1rem;">✓</span>
+                        <span style="font-size: 0.92rem;">{{ f }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div style="margin-top: 22px;">
+                    {% if p.is_free %}
+                    <a href="{% url 'manager_register' %}" class="pn-btn pn-btn-ghost pn-btn-block">Get Started Free</a>
+                    {% elif p.slug == 'pro' %}
+                    <a href="{% url 'manager_login' %}?next={% url 'subs_checkout' p.slug %}?cycle={{ cycle }}" class="pn-btn pn-btn-accent pn-btn-block">Choose {{ p.name }} →</a>
+                    {% else %}
+                    <a href="{% url 'manager_login' %}?next={% url 'subs_checkout' p.slug %}?cycle={{ cycle }}" class="pn-btn pn-btn-primary pn-btn-block">Choose {{ p.name }} →</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="pn-section" style="background: var(--pn-surface);">
+    <div style="max-width: 980px; margin: 0 auto;">
+        <h2 class="pn-section-title">Frequently Asked Questions</h2>
+        <div class="pn-grid pn-grid-2">
+            <div class="pn-card"><h4>💳 Is this a real payment system?</h4><p style="color: var(--pn-text-secondary);">No — this is a <strong>demo/educational</strong> payment system. No real money is charged. Use any test card number, UPI handle, or banking details.</p></div>
+            <div class="pn-card"><h4>🔄 Can I switch plans anytime?</h4><p style="color: var(--pn-text-secondary);">Yes! Upgrade or downgrade at any time from your billing dashboard. Switching to Free is instant; paid upgrades activate immediately upon successful payment.</p></div>
+            <div class="pn-card"><h4>♻️ What about refunds?</h4><p style="color: var(--pn-text-secondary);">In this demo system, you can cancel auto-renewal anytime. Your paid plan stays active until the billing period ends — then it gracefully downgrades to Free.</p></div>
+            <div class="pn-card"><h4>🌍 Why subscribe?</h4><p style="color: var(--pn-text-secondary);">Premium plans unlock unlimited tracking, full Nova AI, advanced analytics, exports, and priority support — perfect for restaurants, hotels, or large families.</p></div>
+        </div>
+    </div>
+</section>
+
+<footer style="background: var(--pn-primary-dark); color: #fff; padding: 40px; text-align: center;">
+    <div>🌿 <strong>Pantry Nova</strong> · Educational demo · IGNOU BCA Final Year Project</div>
+    <div style="color: rgba(255,255,255,0.6); margin-top: 8px; font-size: 0.85rem;">© 2026 · Made with 🌱</div>
+</footer>
+{% endblock %}

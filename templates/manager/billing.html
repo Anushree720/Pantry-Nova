@@ -1,0 +1,137 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Billing & Plans</h1>
+<p style="color: var(--pn-text-secondary);">Manage your Pantry Nova subscription and view payment history.</p>
+
+<div class="pn-card" style="margin: 18px 0; background: linear-gradient(135deg, var(--pn-primary) 0%, var(--pn-primary-dark) 100%); color: #fff; border-top-color: var(--pn-accent);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--pn-accent); font-weight: 600;">Current Plan</div>
+            <div style="display: flex; align-items: center; gap: 14px; margin-top: 6px;">
+                <span style="font-size: 2.5rem;">
+                    {% if sub.plan.slug == 'free' %}🌱{% elif sub.plan.slug == 'pro' %}🌿{% else %}🌳{% endif %}
+                </span>
+                <div>
+                    <h2 style="color: #fff; margin: 0; font-size: 1.8rem;">{{ sub.plan.name }}</h2>
+                    <div style="color: rgba(255,255,255,0.8);">
+                        {% if sub.plan.is_free %}
+                            Free forever
+                        {% else %}
+                            ₹{% if sub.billing_cycle == 'yearly' %}{{ sub.plan.price_yearly }}/year{% else %}{{ sub.plan.price_monthly }}/month{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: right;">
+            {% if sub.is_active_now %}
+                <span style="background: var(--pn-accent); color: #fff; padding: 4px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">● Active</span>
+            {% elif sub.status == 'cancelled' %}
+                <span style="background: var(--pn-warning); color: #fff; padding: 4px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">⚠ Cancelled</span>
+            {% else %}
+                <span style="background: var(--pn-danger); color: #fff; padding: 4px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">Expired</span>
+            {% endif %}
+            {% if sub.expires_at %}
+            <div style="color: rgba(255,255,255,0.85); font-size: 0.85rem; margin-top: 8px;">
+                {% if sub.auto_renew %}
+                Renews {{ sub.expires_at|date:"d M Y" }}
+                {% else %}
+                Ends {{ sub.expires_at|date:"d M Y" }} ({{ sub.days_left }} days left)
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap;">
+        {% if not sub.plan.is_free %}
+        <form method="post" action="{% url 'subs_cancel' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="pn-btn" style="background: rgba(255,255,255,0.15); color: #fff;" {% if not sub.auto_renew %}disabled{% endif %}>
+                {% if sub.auto_renew %}Cancel auto-renewal{% else %}Auto-renewal cancelled{% endif %}
+            </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'pricing' %}" class="pn-btn pn-btn-accent">View All Plans →</a>
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-3" style="margin-bottom: 18px;">
+    <div class="pn-kpi success"><div class="pn-kpi-icon">💸</div><div class="pn-kpi-value">₹{{ total_paid }}</div><div class="pn-kpi-label">Total Paid</div></div>
+    <div class="pn-kpi"><div class="pn-kpi-icon">🧾</div><div class="pn-kpi-value">{{ payments|length }}</div><div class="pn-kpi-label">Payments</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">📅</div><div class="pn-kpi-value">{{ sub.get_billing_cycle_display }}</div><div class="pn-kpi-label">Billing Cycle</div></div>
+</div>
+
+<h2 style="margin-top: 30px;">Available Plans</h2>
+<div class="pn-grid pn-grid-3" style="margin-top: 16px; align-items: stretch;">
+    {% for p in plans %}
+    <div class="pn-card" style="display: flex; flex-direction: column; {% if p.plan_id == sub.plan.plan_id %}border-top-color: var(--pn-accent); border-top-width: 6px;{% endif %}">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h4 style="margin: 0;">
+                {% if p.slug == 'free' %}🌱{% elif p.slug == 'pro' %}🌿{% else %}🌳{% endif %}
+                {{ p.name }}
+            </h4>
+            {% if p.plan_id == sub.plan.plan_id %}<span class="pn-badge pn-badge-fresh">Current</span>{% endif %}
+        </div>
+        <p style="color: var(--pn-text-secondary); font-size: 0.88rem; min-height: 36px;">{{ p.tagline }}</p>
+        <div style="font-family: 'Syne'; font-size: 2rem; font-weight: 700; color: var(--pn-primary);">
+            ₹{{ p.price_monthly }}<small style="font-size: 0.85rem; color: var(--pn-text-secondary); font-weight: 400;">/mo</small>
+        </div>
+        {% if not p.is_free %}<div style="font-size: 0.82rem; color: var(--pn-text-secondary);">or ₹{{ p.price_yearly }}/yr</div>{% endif %}
+
+        <ul style="list-style: none; padding: 0; margin: 14px 0; flex: 1;">
+            {% for f in p.feature_list|slice:":5" %}
+            <li style="padding: 4px 0; font-size: 0.88rem;"><span style="color: var(--pn-accent);">✓</span> {{ f }}</li>
+            {% endfor %}
+        </ul>
+
+        {% if p.plan_id == sub.plan.plan_id %}
+        <button class="pn-btn pn-btn-ghost pn-btn-block" disabled>Current Plan</button>
+        {% else %}
+            {% if p.is_free %}
+            <a href="{% url 'subs_checkout' p.slug %}" class="pn-btn pn-btn-ghost pn-btn-block" data-confirm="Switch to Free? You'll lose premium features.">Switch to Free</a>
+            {% else %}
+            <a href="{% url 'subs_checkout' p.slug %}" class="pn-btn pn-btn-accent pn-btn-block">{% if not sub.plan.is_free and p.price_monthly < sub.plan.price_monthly %}Downgrade{% else %}Upgrade{% endif %} to {{ p.name }}</a>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<h2 style="margin-top: 30px;">Payment History</h2>
+<div class="pn-card" style="margin-top: 16px;">
+    {% if payments %}
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>Transaction ID</th><th>Plan</th><th>Cycle</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th><th>Invoice</th></tr></thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td><code style="font-size: 0.82rem;">{{ p.transaction_id }}</code></td>
+                <td><strong>{{ p.plan.name }}</strong></td>
+                <td>{{ p.get_billing_cycle_display }}</td>
+                <td><strong>₹{{ p.amount }}</strong></td>
+                <td>{{ p.get_method_display }}<br><small class="text-muted">{{ p.masked_account }}</small></td>
+                <td>
+                    {% if p.status == 'success' %}<span class="pn-badge pn-badge-fresh">Success</span>
+                    {% elif p.status == 'failed' %}<span class="pn-badge pn-badge-danger">Failed</span>
+                    {% elif p.status == 'refunded' %}<span class="pn-badge pn-badge-warning">Refunded</span>
+                    {% else %}<span class="pn-badge pn-badge-warning">Pending</span>{% endif %}
+                </td>
+                <td>{{ p.created_at|date:"d M Y H:i" }}</td>
+                <td><a href="{% url 'subs_invoice' p.payment_id %}" class="pn-btn pn-btn-ghost pn-btn-sm"><i class="bi bi-file-earmark-pdf"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="pn-empty"><div class="icon">🧾</div><p>No payments yet — you're on the Free plan!</p></div>
+    {% endif %}
+</div>
+
+<div style="background: rgba(244,162,97,0.1); border-left: 4px solid var(--pn-warning); padding: 14px 18px; border-radius: 10px; margin-top: 24px; font-size: 0.9rem;">
+    <strong>🌿 Demo Notice:</strong> This is a simulated payment system for educational purposes. No real money is charged. Use any test card number, UPI handle, or banking details.
+</div>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'manager_billing' %}" style="color: var(--pn-text-secondary);"><i class="bi bi-arrow-left"></i> Back to Billing</a>
+
+<div class="pn-grid pn-grid-2" style="margin-top: 16px; gap: 24px;">
+    {# ===== Order Summary ===== #}
+    <div>
+        <h2 style="margin: 0 0 14px;">Order Summary</h2>
+        <div class="pn-card" style="border-top-color: var(--pn-accent);">
+            <div style="display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--pn-border);">
+                <span style="font-size: 2.5rem;">
+                    {% if plan.slug == 'pro' %}🌿{% else %}🌳{% endif %}
+                </span>
+                <div>
+                    <h3 style="margin: 0;">{{ plan.name }} Plan</h3>
+                    <div style="color: var(--pn-text-secondary); font-size: 0.9rem;">{{ plan.tagline }}</div>
+                </div>
+            </div>
+
+            <div style="margin: 16px 0;">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--pn-text-secondary); font-weight: 600; margin-bottom: 8px;">Billing Cycle</div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="?cycle=monthly" class="pn-btn pn-btn-sm" style="flex: 1; {% if cycle == 'monthly' %}background: var(--pn-primary); color: #fff;{% else %}background: var(--pn-surface); color: var(--pn-text);{% endif %}">
+                        Monthly · ₹{{ plan.price_monthly }}
+                    </a>
+                    <a href="?cycle=yearly" class="pn-btn pn-btn-sm" style="flex: 1; position: relative; {% if cycle == 'yearly' %}background: var(--pn-primary); color: #fff;{% else %}background: var(--pn-surface); color: var(--pn-text);{% endif %}">
+                        Yearly · ₹{{ plan.price_yearly }}
+                        <span style="position: absolute; top: -8px; right: -4px; background: var(--pn-accent); color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px;">SAVE</span>
+                    </a>
+                </div>
+            </div>
+
+            <table style="width: 100%; margin-top: 10px;">
+                <tr><td style="padding: 6px 0; color: var(--pn-text-secondary);">Subtotal</td><td style="text-align: right; padding: 6px 0;">₹{{ amount }}</td></tr>
+                <tr><td style="padding: 6px 0; color: var(--pn-text-secondary);">GST (incl.)</td><td style="text-align: right; padding: 6px 0;">₹0</td></tr>
+                <tr style="border-top: 1px solid var(--pn-border);">
+                    <td style="padding: 14px 0;"><strong>Total Today</strong></td>
+                    <td style="text-align: right; padding: 14px 0;">
+                        <span style="font-family: 'Syne'; font-size: 2rem; font-weight: 700; color: var(--pn-primary);">₹{{ amount }}</span>
+                        <div style="font-size: 0.78rem; color: var(--pn-text-secondary);">/{{ cycle }}</div>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="background: var(--pn-surface); padding: 14px; border-radius: 10px; margin-top: 14px;">
+                <strong style="color: var(--pn-primary);">✓ What you get:</strong>
+                <ul style="margin: 8px 0 0; padding-left: 20px; font-size: 0.88rem;">
+                    {% for f in plan.feature_list %}<li>{{ f }}</li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {# ===== Payment Form ===== #}
+    <div>
+        <h2 style="margin: 0 0 14px;">Payment Method</h2>
+        <div class="pn-card">
+            <div style="background: rgba(244,162,97,0.12); padding: 10px 14px; border-radius: 10px; margin-bottom: 18px; font-size: 0.85rem;">
+                <strong>🌿 Demo Mode:</strong> No real money will be charged. Enter any test data — payment will succeed.
+            </div>
+
+            {# Method tabs #}
+            <div style="display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto;">
+                <button type="button" class="pn-chip active" data-method="card">💳 Card</button>
+                <button type="button" class="pn-chip" data-method="upi">📱 UPI</button>
+                <button type="button" class="pn-chip" data-method="netbanking">🏦 Net Banking</button>
+                <button type="button" class="pn-chip" data-method="wallet">👛 Wallet</button>
+            </div>
+
+            <form method="post" action="{% url 'subs_pay' plan.slug %}" id="payForm">
+                {% csrf_token %}
+                <input type="hidden" name="cycle" value="{{ cycle }}">
+                <input type="hidden" name="method" id="methodInput" value="card">
+
+                {# Card Form #}
+                <div data-method-form="card">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Card Number</label>
+                        <input class="pn-form-control" name="card_number" placeholder="4242 4242 4242 4242" maxlength="23" id="cardNum">
+                        <small style="color: var(--pn-text-secondary);">Test card: 4242 4242 4242 4242</small>
+                    </div>
+                    <div class="pn-grid pn-grid-2">
+                        <div class="pn-form-group"><label class="pn-form-label">Expiry (MM/YY)</label><input class="pn-form-control" name="expiry" placeholder="12/30" maxlength="5" id="expInput"></div>
+                        <div class="pn-form-group"><label class="pn-form-label">CVV</label><input class="pn-form-control" name="cvv" placeholder="123" maxlength="4"></div>
+                    </div>
+                    <div class="pn-form-group"><label class="pn-form-label">Cardholder Name</label><input class="pn-form-control" name="card_name" placeholder="As on card"></div>
+                </div>
+
+                {# UPI Form #}
+                <div data-method-form="upi" style="display: none;">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">UPI ID</label>
+                        <input class="pn-form-control" name="upi_id" placeholder="yourname@paytm">
+                        <small style="color: var(--pn-text-secondary);">Format: username@bank (e.g., demo@paytm, test@okaxis)</small>
+                    </div>
+                    <div style="background: var(--pn-surface); padding: 12px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.85rem; color: var(--pn-text-secondary);">Or scan QR with any UPI app</div>
+                        <div style="font-family: 'Syne'; font-size: 2rem; margin: 8px 0;">📱</div>
+                        <div style="background: #fff; width: 140px; height: 140px; margin: 0 auto; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 4rem;">⬛</div>
+                    </div>
+                </div>
+
+                {# Net Banking #}
+                <div data-method-form="netbanking" style="display: none;">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Select Bank</label>
+                        <select class="pn-form-select" name="bank">
+                            <option value="">— Choose —</option>
+                            <option value="HDFC Bank">HDFC Bank</option>
+                            <option value="State Bank of India">State Bank of India</option>
+                            <option value="ICICI Bank">ICICI Bank</option>
+                            <option value="Axis Bank">Axis Bank</option>
+                            <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                            <option value="Punjab National Bank">Punjab National Bank</option>
+                            <option value="Bank of Baroda">Bank of Baroda</option>
+                            <option value="Yes Bank">Yes Bank</option>
+                        </select>
+                    </div>
+                </div>
+
+                {# Wallet #}
+                <div data-method-form="wallet" style="display: none;">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Select Wallet</label>
+                        <div class="pn-grid pn-grid-2" style="gap: 8px;">
+                            {% for w in 'Paytm,PhonePe,Google Pay,Amazon Pay,Mobikwik,Freecharge'|cut:' '|slice:'0:'|stringformat:'s' %}{% endfor %}
+                            <label class="pn-card" style="padding: 12px; cursor: pointer; text-align: center;"><input type="radio" name="wallet" value="Paytm" style="display:none;" checked><div style="font-size: 1.6rem;">💙</div><div>Paytm</div></label>
+                            <label class="pn-card" style="padding: 12px; cursor: pointer; text-align: center;"><input type="radio" name="wallet" value="PhonePe" style="display:none;"><div style="font-size: 1.6rem;">💜</div><div>PhonePe</div></label>
+                            <label class="pn-card" style="padding: 12px; cursor: pointer; text-align: center;"><input type="radio" name="wallet" value="Google Pay" style="display:none;"><div style="font-size: 1.6rem;">🔵</div><div>Google Pay</div></label>
+                            <label class="pn-card" style="padding: 12px; cursor: pointer; text-align: center;"><input type="radio" name="wallet" value="Amazon Pay" style="display:none;"><div style="font-size: 1.6rem;">🟠</div><div>Amazon Pay</div></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--pn-border); margin: 20px 0; padding-top: 20px;">
+                    <button type="submit" class="pn-btn pn-btn-accent pn-btn-block" id="payBtn" style="font-size: 1.05rem; padding: 14px;">
+                        🔒 Pay ₹{{ amount }} Securely
+                    </button>
+                    <p style="text-align: center; font-size: 0.78rem; color: var(--pn-text-secondary); margin: 12px 0 0;">
+                        🌿 Your subscription will activate immediately upon successful payment
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Method tab switching
+document.querySelectorAll('[data-method]').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const m = this.dataset.method;
+        document.getElementById('methodInput').value = m;
+        document.querySelectorAll('[data-method]').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('[data-method-form]').forEach(f => {
+            f.style.display = f.dataset.methodForm === m ? '' : 'none';
+        });
+    });
+});
+
+// Card number formatting
+const cardNum = document.getElementById('cardNum');
+if (cardNum) {
+    cardNum.addEventListener('input', function() {
+        let v = this.value.replace(/\D/g, '').slice(0, 19);
+        this.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+    });
+}
+
+// Expiry formatting
+const expInput = document.getElementById('expInput');
+if (expInput) {
+    expInput.addEventListener('input', function() {
+        let v = this.value.replace(/\D/g, '').slice(0, 4);
+        if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2);
+        this.value = v;
+    });
+}
+
+// Show "processing" state on submit
+document.getElementById('payForm').addEventListener('submit', function() {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="pn-chat-typing" style="padding:0;display:inline-flex;"><span style="width:6px;height:6px;background:#fff;border-radius:50%;margin:0 2px;"></span><span style="width:6px;height:6px;background:#fff;border-radius:50%;margin:0 2px;"></span><span style="width:6px;height:6px;background:#fff;border-radius:50%;margin:0 2px;"></span></span> Processing payment...';
+});
+</script>
+{% endblock %}

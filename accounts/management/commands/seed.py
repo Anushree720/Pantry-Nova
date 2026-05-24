@@ -11,6 +11,7 @@ from managers.models import KitchenManager
 from members.models import FamilyMember
 from inventory.models import Category, PantryItem
 from waste.models import WasteLog
+from subscriptions.models import Plan, Subscription
 
 
 class Command(BaseCommand):
@@ -26,6 +27,40 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f'  ! Fixture loading failed: {e}'))
 
         with transaction.atomic():
+            # ===== Subscription Plans =====
+            plan_data = [
+                {
+                    'name': 'Free', 'slug': 'free',
+                    'tagline': 'Get started with the basics — perfect for small families.',
+                    'price_monthly': 0, 'price_yearly': 0,
+                    'max_items': 50, 'max_members': 1,
+                    'ai_access': False, 'advanced_analytics': False,
+                    'pdf_csv_export': False, 'priority_support': False,
+                    'badge_color': 'primary', 'sort_order': 1,
+                },
+                {
+                    'name': 'Pro', 'slug': 'pro',
+                    'tagline': 'For active households who want full Nova AI and analytics.',
+                    'price_monthly': 299, 'price_yearly': 2999,
+                    'max_items': 500, 'max_members': 5,
+                    'ai_access': True, 'advanced_analytics': True,
+                    'pdf_csv_export': True, 'priority_support': False,
+                    'badge_color': 'accent', 'sort_order': 2,
+                },
+                {
+                    'name': 'Premium', 'slug': 'premium',
+                    'tagline': 'Unlimited everything — for restaurants, hotels & large families.',
+                    'price_monthly': 499, 'price_yearly': 4999,
+                    'max_items': -1, 'max_members': -1,
+                    'ai_access': True, 'advanced_analytics': True,
+                    'pdf_csv_export': True, 'priority_support': True,
+                    'badge_color': 'warning', 'sort_order': 3,
+                },
+            ]
+            for pd in plan_data:
+                Plan.objects.update_or_create(slug=pd['slug'], defaults=pd)
+            self.stdout.write(self.style.SUCCESS('  ✓ Subscription plans seeded (Free, Pro, Premium).'))
+
             # ===== Admin =====
             if not Login.objects.filter(username='admin').exists():
                 admin = Login(
@@ -74,6 +109,13 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS('  ✓ Manager user created. (manager / manager123)'))
             else:
                 self.stdout.write('  · Manager user already exists.')
+
+            # ===== Subscription for sample household =====
+            free_plan = Plan.objects.get(slug='free')
+            Subscription.objects.get_or_create(
+                household=household,
+                defaults={'plan': free_plan, 'status': 'active'},
+            )
 
             # ===== Family Member =====
             if not Login.objects.filter(username='member').exists():

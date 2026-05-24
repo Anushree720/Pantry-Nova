@@ -1,0 +1,52 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="max-width: 640px; margin: 40px auto; text-align: center;">
+    <div style="width: 100px; height: 100px; background: var(--pn-accent); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 3.5rem; color: #fff; box-shadow: 0 0 0 14px rgba(82, 183, 136, 0.18); animation: pulseRed 2s infinite;">
+        ✓
+    </div>
+    <h1 style="margin-top: 24px; font-size: 2.4rem;">Payment Successful! 🌿</h1>
+    <p style="color: var(--pn-text-secondary); font-size: 1.05rem;">Welcome to <strong>{{ payment.plan.name }}</strong>. Your subscription is now active.</p>
+
+    <div class="pn-card" style="text-align: left; margin-top: 30px; border-top-color: var(--pn-accent);">
+        <h3 class="pn-card-title">🧾 Receipt</h3>
+        <table style="width: 100%; font-size: 0.95rem;">
+            <tr><td style="padding: 8px 0; color: var(--pn-text-secondary);">Transaction ID</td><td style="padding: 8px 0; text-align: right;"><code>{{ payment.transaction_id }}</code></td></tr>
+            <tr><td style="padding: 8px 0; color: var(--pn-text-secondary);">Plan</td><td style="padding: 8px 0; text-align: right;"><strong>{{ payment.plan.name }}</strong></td></tr>
+            <tr><td style="padding: 8px 0; color: var(--pn-text-secondary);">Billing Cycle</td><td style="padding: 8px 0; text-align: right;">{{ payment.get_billing_cycle_display }}</td></tr>
+            <tr><td style="padding: 8px 0; color: var(--pn-text-secondary);">Method</td><td style="padding: 8px 0; text-align: right;">{{ payment.get_method_display }}{% if payment.masked_account %} · {{ payment.masked_account }}{% endif %}</td></tr>
+            <tr><td style="padding: 8px 0; color: var(--pn-text-secondary);">Date</td><td style="padding: 8px 0; text-align: right;">{{ payment.created_at|date:"d M Y, H:i" }}</td></tr>
+            <tr><td style="padding: 8px 0; color: var(--pn-text-secondary);">Next Renewal</td><td style="padding: 8px 0; text-align: right;">{{ sub.expires_at|date:"d M Y" }}</td></tr>
+            <tr style="border-top: 1px solid var(--pn-border);"><td style="padding: 14px 0;"><strong>Total Paid</strong></td><td style="padding: 14px 0; text-align: right;">
+                <span style="font-family: 'Syne'; font-size: 1.8rem; font-weight: 700; color: var(--pn-accent);">₹{{ payment.amount }}</span>
+            </td></tr>
+        </table>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'subs_invoice' payment.payment_id %}" class="pn-btn pn-btn-ghost">
+            <i class="bi bi-file-earmark-pdf"></i> Download Invoice
+        </a>
+        <a href="{% url 'manager_billing' %}" class="pn-btn pn-btn-primary">
+            View Billing Dashboard
+        </a>
+        <a href="{% url 'manager_dashboard' %}" class="pn-btn pn-btn-accent">
+            Back to Pantry →
+        </a>
+    </div>
+
+    <div style="margin-top: 24px; padding: 14px; background: rgba(82,183,136,0.1); border-radius: 10px; font-size: 0.85rem; color: var(--pn-text-secondary);">
+        🌿 A receipt has been emailed to {{ session_user.email }} (in production). Demo mode: no real email sent.
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Confetti-like burst on load
+if (window.gsap) {
+    gsap.from('.pn-card', { opacity: 0, y: 30, duration: 0.6, ease: 'power3.out' });
+}
+</script>
+{% endblock %}

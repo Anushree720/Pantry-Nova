@@ -28,6 +28,8 @@
         <i class="bi bi-people-fill"></i> Family Members</a></li>
     <li><a href="{% url 'chatbot' %}" class="{% if request.resolver_match.url_name == 'chatbot' %}active{% endif %}">
         <i class="bi bi-robot"></i> Nova AI</a></li>
+    <li><a href="{% url 'manager_billing' %}" class="{% if 'subs' in request.resolver_match.url_name or request.resolver_match.url_name == 'manager_billing' %}active{% endif %}">
+        <i class="bi bi-credit-card-fill"></i> Billing & Plans</a></li>
     <li><a href="{% url 'manager_profile' %}" class="{% if request.resolver_match.url_name == 'manager_profile' %}active{% endif %}">
         <i class="bi bi-person-circle"></i> Profile</a></li>
     <li><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>

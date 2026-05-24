@@ -16,6 +16,7 @@ urlpatterns = [
     path('manager/', include('managers.urls')),
     path('member/', include('members.urls')),
     path('chatbot/', include('chatbot.urls')),
+    path('', include('subscriptions.urls')),
 ]
 
 if settings.DEBUG:
