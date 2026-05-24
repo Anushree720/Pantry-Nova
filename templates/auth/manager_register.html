@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Register as Kitchen Manager — Pantry Nova{% endblock %}
+
+{% block body %}
+<div class="pn-auth-page">
+    <div class="pn-auth-side">
+        <div style="position: relative; z-index: 2;">
+            <a href="{% url 'landing' %}" style="color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 8px; margin-bottom: 30px; font-size: 0.9rem;">
+                <i class="bi bi-arrow-left"></i> Back to home
+            </a>
+            <div style="font-size: 4rem; margin-bottom: 16px;">🌿</div>
+            <h1>Build Your<br>Smart Pantry</h1>
+            <p>Start tracking your kitchen, get AI-powered alerts, and invite your family to join the sustainable revolution.</p>
+            <div style="margin-top: 30px;">
+                <div style="margin: 12px 0; color: rgba(255,255,255,0.85);">✓ Your own household join code</div>
+                <div style="margin: 12px 0; color: rgba(255,255,255,0.85);">✓ Unlimited inventory tracking</div>
+                <div style="margin: 12px 0; color: rgba(255,255,255,0.85);">✓ Free Nova AI assistant access</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pn-auth-form">
+        <div class="pn-auth-card">
+            <h2 style="margin-bottom: 6px;">Kitchen Manager Sign Up</h2>
+            <p style="color: var(--pn-text-secondary);">Create your household and start tracking.</p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Full Name</label><input class="pn-form-control" name="full_name" required></div>
+                    <div class="pn-form-group"><label class="pn-form-label">Username</label><input class="pn-form-control" name="username" required></div>
+                </div>
+                <div class="pn-form-group"><label class="pn-form-label">Email</label><input type="email" class="pn-form-control" name="email" required></div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Password</label>
+                        <input type="password" class="pn-form-control" name="password" id="pw" data-password-strength="#pwBar" required minlength="6">
+                        <div class="pn-progress" style="margin-top:6px;"><div class="pn-progress-bar" id="pwBar" style="width:0;"></div></div>
+                    </div>
+                    <div class="pn-form-group"><label class="pn-form-label">Confirm Password</label><input type="password" class="pn-form-control" name="confirm_password" required></div>
+                </div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Phone</label><input class="pn-form-control" name="phone" required></div>
+                    <div class="pn-form-group"><label class="pn-form-label">Household Name</label><input class="pn-form-control" name="household_name" required></div>
+                </div>
+
+                <div class="pn-form-group">
+                    <label class="pn-form-label">Household Type</label>
+                    <div class="pn-grid pn-grid-3" style="gap: 8px;">
+                        <label class="pn-card" style="padding: 12px; text-align: center; cursor: pointer; border-top-color: var(--pn-accent);">
+                            <input type="radio" name="household_type" value="home" checked style="display:none;">
+                            <div style="font-size: 1.6rem;">🏠</div><div>Home</div>
+                        </label>
+                        <label class="pn-card" style="padding: 12px; text-align: center; cursor: pointer; border-top-color: var(--pn-accent);">
+                            <input type="radio" name="household_type" value="restaurant" style="display:none;">
+                            <div style="font-size: 1.6rem;">🍽️</div><div>Restaurant</div>
+                        </label>
+                        <label class="pn-card" style="padding: 12px; text-align: center; cursor: pointer; border-top-color: var(--pn-accent);">
+                            <input type="radio" name="household_type" value="hotel" style="display:none;">
+                            <div style="font-size: 1.6rem;">🏨</div><div>Hotel</div>
+                        </label>
+                        <label class="pn-card" style="padding: 12px; text-align: center; cursor: pointer; border-top-color: var(--pn-accent);">
+                            <input type="radio" name="household_type" value="canteen" style="display:none;">
+                            <div style="font-size: 1.6rem;">🥪</div><div>Canteen</div>
+                        </label>
+                        <label class="pn-card" style="padding: 12px; text-align: center; cursor: pointer; border-top-color: var(--pn-accent);">
+                            <input type="radio" name="household_type" value="school" style="display:none;">
+                            <div style="font-size: 1.6rem;">🏫</div><div>School</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pn-form-group"><label class="pn-form-label">Address</label><textarea class="pn-form-control" name="address" rows="2" required></textarea></div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">City</label><input class="pn-form-control" name="city" required></div>
+                    <div class="pn-form-group"><label class="pn-form-label">PIN Code</label><input class="pn-form-control" name="pin_code" required></div>
+                </div>
+
+                <button class="pn-btn pn-btn-accent pn-btn-block" type="submit">
+                    🌿 Create Account & Get Join Code
+                </button>
+            </form>
+
+            <p style="margin-top: 20px; text-align: center; color: var(--pn-text-secondary);">
+                Already have an account? <a href="{% url 'manager_login' %}">Log in</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

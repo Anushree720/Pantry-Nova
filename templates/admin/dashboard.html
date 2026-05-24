@@ -1,0 +1,110 @@
+{% extends 'dashboard_base.html' %}
+{% block title %}Admin Dashboard — Pantry Nova{% endblock %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+        <h1 style="margin: 0;">Good day, Admin 🌿</h1>
+        <p style="color: var(--pn-text-secondary); margin: 4px 0;">Here's what's happening across Pantry Nova today.</p>
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-3" style="margin-bottom: 24px;">
+    <div class="pn-kpi"><div class="pn-kpi-icon"><i class="bi bi-house-door-fill"></i></div>
+        <div class="pn-kpi-value pn-counter" data-counter="{{ total_households }}">0</div>
+        <div class="pn-kpi-label">Total Households</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-icon"><i class="bi bi-box-seam-fill"></i></div>
+        <div class="pn-kpi-value" data-counter="{{ active_items }}">0</div>
+        <div class="pn-kpi-label">Active Items</div></div>
+    <div class="pn-kpi danger pulse-red"><div class="pn-kpi-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+        <div class="pn-kpi-value" data-counter="{{ expiring_today }}">0</div>
+        <div class="pn-kpi-label">Expiring Today</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon"><i class="bi bi-recycle"></i></div>
+        <div class="pn-kpi-value" data-counter="{{ total_waste }}">0</div>
+        <div class="pn-kpi-label">Total Waste Logged</div></div>
+    <div class="pn-kpi danger"><div class="pn-kpi-icon"><i class="bi bi-chat-square-text-fill"></i></div>
+        <div class="pn-kpi-value" data-counter="{{ pending_complaints }}">0</div>
+        <div class="pn-kpi-label">Pending Complaints</div></div>
+    <div class="pn-kpi"><div class="pn-kpi-icon"><i class="bi bi-emoji-smile-fill"></i></div>
+        <div class="pn-kpi-value" data-counter="{{ feedback_count }}">0</div>
+        <div class="pn-kpi-label">Platform Feedback</div></div>
+</div>
+
+<div class="pn-grid pn-grid-2" style="margin-bottom: 24px;">
+    <div class="pn-card">
+        <h3 class="pn-card-title">Items Added per Month</h3>
+        <canvas id="itemsChart" height="220"></canvas>
+    </div>
+    <div class="pn-card">
+        <h3 class="pn-card-title">Item Categories</h3>
+        <canvas id="catChart" height="220"></canvas>
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-2" style="margin-bottom: 24px;">
+    <div class="pn-card">
+        <h3 class="pn-card-title">Waste Logged Over Time</h3>
+        <canvas id="wasteChart" height="220"></canvas>
+    </div>
+    <div class="pn-card">
+        <h3 class="pn-card-title">Complaints per Month</h3>
+        <canvas id="compChart" height="220"></canvas>
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div class="pn-card">
+        <h3 class="pn-card-title">Recent Activity</h3>
+        <div style="max-height: 320px; overflow-y: auto;">
+        {% for a in recent_activities %}
+            <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--pn-border);">
+                <div style="width: 36px; height: 36px; background: var(--pn-surface); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--pn-primary);"><i class="{{ a.icon }}"></i></div>
+                <div style="flex: 1;">
+                    <div style="font-size: 0.92rem;">{{ a.text }}</div>
+                    <div style="font-size: 0.78rem; color: var(--pn-text-muted);">{{ a.time|timesince }} ago</div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="pn-empty"><div class="icon">🌿</div><p>No recent activity yet.</p></div>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="pn-card" style="background: linear-gradient(135deg, var(--pn-primary) 0%, var(--pn-primary-dark) 100%); color: #fff; border-top-color: var(--pn-accent);">
+        <h3 class="pn-card-title" style="color: #fff;">🌍 Platform Impact</h3>
+        <div style="text-align: center; padding: 20px 0;">
+            <div style="font-family: 'Syne'; font-size: 4rem; font-weight: 700; color: var(--pn-accent);" data-counter="{{ total_kg_saved|floatformat:0 }}">0</div>
+            <div style="text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; color: rgba(255,255,255,0.85);">kg of food saved system-wide</div>
+        </div>
+        <div class="pn-divider" style="background: rgba(255,255,255,0.1);"></div>
+        <p style="color: rgba(255,255,255,0.85);">Every kilogram of food saved through Pantry Nova represents fewer emissions, less landfill waste, and a more sustainable food system.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const palette = {primary: '#1B4332', accent: '#52B788', warning: '#F4A261', danger: '#E63946'};
+
+new Chart(document.getElementById('itemsChart'), {
+    type: 'bar',
+    data: {labels: {{ items_chart_labels|safe }}, datasets: [{label: 'Items', data: {{ items_chart_data|safe }}, backgroundColor: palette.accent, borderRadius: 6}]},
+    options: {plugins:{legend:{display:false}}, responsive: true, maintainAspectRatio: false}
+});
+new Chart(document.getElementById('catChart'), {
+    type: 'doughnut',
+    data: {labels: {{ cat_labels|safe }}, datasets: [{data: {{ cat_data|safe }}, backgroundColor: ['#52B788', '#1B4332', '#F4A261', '#E63946', '#74C69D', '#95B895', '#6B7F6B']}]},
+    options: {plugins:{legend:{position:'right'}}, responsive: true, maintainAspectRatio: false}
+});
+new Chart(document.getElementById('wasteChart'), {
+    type: 'line',
+    data: {labels: {{ waste_labels|safe }}, datasets: [{label: 'Waste', data: {{ waste_data|safe }}, borderColor: palette.warning, backgroundColor: 'rgba(244,162,97,0.15)', fill: true, tension: 0.4}]},
+    options: {plugins:{legend:{display:false}}, responsive: true, maintainAspectRatio: false}
+});
+new Chart(document.getElementById('compChart'), {
+    type: 'bar',
+    data: {labels: {{ comp_labels|safe }}, datasets: [{label: 'Complaints', data: {{ comp_data|safe }}, backgroundColor: palette.danger, borderRadius: 6}]},
+    options: {plugins:{legend:{display:false}}, responsive: true, maintainAspectRatio: false}
+});
+</script>
+{% endblock %}

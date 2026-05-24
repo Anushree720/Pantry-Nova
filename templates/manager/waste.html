@@ -1,0 +1,122 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div><h1 style="margin: 0;">Waste Log</h1><p style="color: var(--pn-text-secondary); margin: 4px 0;">Track every waste event to reduce environmental impact.</p></div>
+    <button class="pn-btn pn-btn-warning" data-modal-open="wasteModal"><i class="bi bi-recycle"></i> Log Waste</button>
+</div>
+
+<div class="pn-grid pn-grid-3" style="margin-bottom: 18px;">
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">♻️</div><div class="pn-kpi-value" data-counter="{{ total_month }}">0</div><div class="pn-kpi-label">Wastes This Month</div></div>
+    <div class="pn-kpi danger"><div class="pn-kpi-icon">💸</div><div class="pn-kpi-value">₹{{ total_cost }}</div><div class="pn-kpi-label">Total Cost Wasted</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-icon">🌍</div><div class="pn-kpi-value">{{ total_co2 }}</div><div class="pn-kpi-label">CO₂ Impact (kg)</div></div>
+</div>
+
+<div class="pn-grid pn-grid-2" style="margin-bottom: 18px;">
+    <div class="pn-card"><h3 class="pn-card-title">Waste by Category</h3>
+        {% if cat_labels %}<canvas id="catChart" height="220"></canvas>{% else %}<div class="pn-empty"><div class="icon">📊</div><p>No waste logged yet</p></div>{% endif %}
+    </div>
+    <div class="pn-card"><h3 class="pn-card-title">Waste by Week</h3><canvas id="weekChart" height="220"></canvas></div>
+</div>
+
+<div class="pn-grid pn-grid-2" style="margin-bottom: 18px;">
+    <div class="pn-card"><h3 class="pn-card-title">Cost of Waste (6 months)</h3><canvas id="costChart" height="220"></canvas></div>
+    <div class="pn-card" style="background: linear-gradient(135deg, var(--pn-accent) 0%, var(--pn-primary) 100%); color: #fff; border-top-color: #fff;">
+        <h3 class="pn-card-title" style="color: #fff;">🌿 Nova's Waste Reduction Tip</h3>
+        <div id="tipDisplay" style="font-size: 1.05rem; line-height: 1.5; min-height: 70px; transition: opacity 0.3s;">{{ tips.0 }}</div>
+        <div style="margin-top: 12px; opacity: 0.7; font-size: 0.85rem;">Tip rotates every 5 seconds</div>
+    </div>
+</div>
+
+<div class="pn-card">
+    <h3 class="pn-card-title">All Waste Records</h3>
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>#</th><th>Item</th><th>Category</th><th>Quantity</th><th>Reason</th><th>Cost ₹</th><th>CO₂ kg</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+            {% for w in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ w.item_name }}</strong></td>
+                <td>{{ w.category.name|default:'—' }}</td>
+                <td>{{ w.quantity }} {{ w.unit }}</td>
+                <td><span class="pn-badge pn-badge-warning">{{ w.get_reason_display }}</span></td>
+                <td>₹{{ w.estimated_cost }}</td>
+                <td>{{ w.co2_equivalent }}</td>
+                <td>{{ w.logged_at|date:"d M Y" }}</td>
+                <td><a href="{% url 'manager_waste_delete' w.waste_id %}" class="pn-btn pn-btn-danger pn-btn-sm" data-confirm="Delete?"><i class="bi bi-trash"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pn-modal-overlay" id="wasteModal">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3>Log Waste</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <form method="post" action="{% url 'manager_waste_save' %}">
+            {% csrf_token %}
+            <div class="pn-modal-body">
+                <div class="pn-form-group"><label class="pn-form-label">Item Name</label><input class="pn-form-control" name="item_name" required></div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Category</label>
+                        <select class="pn-form-select" name="category">
+                            <option value="">— Select —</option>
+                            {% for c in cats %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Reason</label>
+                        <select class="pn-form-select" name="reason">
+                            <option value="expired">Expired</option>
+                            <option value="overcooked">Overcooked</option>
+                            <option value="spoiled">Spoiled</option>
+                            <option value="over_purchased">Over-purchased</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Quantity</label><input type="number" step="0.01" class="pn-form-control" name="quantity" value="1" required></div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Unit</label>
+                        <select class="pn-form-select" name="unit">
+                            <option value="kg" selected>kg</option><option value="g">g</option>
+                            <option value="L">L</option><option value="ml">ml</option>
+                            <option value="pcs">pcs</option><option value="packets">packets</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-form-group"><label class="pn-form-label">Estimated Cost ₹</label><input type="number" step="0.01" class="pn-form-control" name="estimated_cost" value="0"></div>
+            </div>
+            <div class="pn-modal-footer">
+                <button type="button" class="pn-btn pn-btn-ghost" data-modal-close>Cancel</button>
+                <button type="submit" class="pn-btn pn-btn-warning">♻️ Log Waste</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+{% if cat_labels %}
+new Chart(document.getElementById('catChart'),{type:'pie',data:{labels:{{ cat_labels|safe }},datasets:[{data:{{ cat_data|safe }},backgroundColor:['#52B788','#1B4332','#F4A261','#E63946','#74C69D','#95B895']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
+{% endif %}
+new Chart(document.getElementById('weekChart'),{type:'bar',data:{labels:{{ week_labels|safe }},datasets:[{label:'Wastes',data:{{ week_data|safe }},backgroundColor:'#F4A261',borderRadius:6}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('costChart'),{type:'line',data:{labels:{{ cost_labels|safe }},datasets:[{label:'Cost ₹',data:{{ cost_data|safe }},borderColor:'#E63946',backgroundColor:'rgba(230,57,70,0.15)',fill:true,tension:0.4}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+
+const tips = {{ tips|safe }};
+let tipIdx = 0;
+const tipEl = document.getElementById('tipDisplay');
+setInterval(()=>{
+    tipEl.style.opacity = '0';
+    setTimeout(()=>{
+        tipIdx = (tipIdx + 1) % tips.length;
+        tipEl.textContent = tips[tipIdx];
+        tipEl.style.opacity = '1';
+    }, 300);
+}, 5000);
+</script>
+{% endblock %}

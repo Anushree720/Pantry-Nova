@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}404 — Pantry Nova{% endblock %}
+
+{% block body %}
+<div class="pn-404">
+    <div style="font-size: 5rem; margin-bottom: 16px; animation: pnFloat 3s ease-in-out infinite;">🥀</div>
+    <h1>404</h1>
+    <h2 style="color: #fff; margin: 12px 0;">Looks like this page went to waste 🌱</h2>
+    <p style="color: rgba(255,255,255,0.85); max-width: 480px; margin: 0 auto 30px;">
+        The page you're looking for doesn't exist or has been moved. Let's get you back to your fresh pantry.
+    </p>
+    <a href="{% url 'landing' %}" class="pn-btn pn-btn-accent" style="font-size: 1rem;">
+        <i class="bi bi-house-door-fill"></i> Go Back Home
+    </a>
+</div>
+{% endblock %}

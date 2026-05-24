@@ -1,0 +1,73 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div><h1 style="margin: 0;">My Complaints</h1><p style="color: var(--pn-text-secondary); margin: 4px 0;">Submit issues and track responses.</p></div>
+    <button class="pn-btn pn-btn-warning" data-modal-open="complaintModal"><i class="bi bi-chat-square-text-fill"></i> Submit Complaint</button>
+</div>
+
+<div class="pn-card">
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>#</th><th>Complaint</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for c in items %}
+            <tr>
+                <td>{{ c.complaint_id }}</td>
+                <td>{{ c.complaint_text|truncatechars:80 }}</td>
+                <td>{{ c.complaint_date|date:"d M Y" }}</td>
+                <td>{% if c.status == 'pending' %}<span class="pn-badge pn-badge-warning">Pending</span>{% else %}<span class="pn-badge pn-badge-fresh">Replied</span>{% endif %}</td>
+                <td><button class="pn-btn pn-btn-ghost pn-btn-sm" data-modal-open="cmp{{ c.complaint_id }}"><i class="bi bi-eye"></i></button></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5"><div class="pn-empty"><div class="icon">🌿</div><p>No complaints yet</p></div></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pn-modal-overlay" id="complaintModal">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3>Submit Complaint</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="pn-modal-body">
+                <div class="pn-form-group">
+                    <label class="pn-form-label">Tell us what's wrong</label>
+                    <textarea class="pn-form-control" name="complaint_text" rows="6" maxlength="500" required oninput="document.getElementById('cmpCount').textContent = this.value.length"></textarea>
+                    <small style="color: var(--pn-text-secondary);"><span id="cmpCount">0</span>/500</small>
+                </div>
+            </div>
+            <div class="pn-modal-footer">
+                <button type="button" class="pn-btn pn-btn-ghost" data-modal-close>Cancel</button>
+                <button type="submit" class="pn-btn pn-btn-warning">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% for c in items %}
+<div class="pn-modal-overlay" id="cmp{{ c.complaint_id }}">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3>Complaint #{{ c.complaint_id }}</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <div class="pn-modal-body">
+            <div style="padding: 12px; background: var(--pn-surface); border-radius: 10px; margin-bottom: 12px;">
+                <strong>Your complaint</strong> — {{ c.complaint_date|date:"d M Y" }}
+                <p style="margin: 6px 0 0;">{{ c.complaint_text }}</p>
+            </div>
+            {% if c.reply_text %}
+            <div style="padding: 12px; background: rgba(82,183,136,0.1); border-left: 3px solid var(--pn-accent); border-radius: 8px;">
+                <strong>Admin Reply</strong>
+                <p style="margin: 6px 0 0;">{{ c.reply_text }}</p>
+            </div>
+            {% else %}
+            <div style="padding: 12px; background: rgba(244,162,97,0.15); border-left: 3px solid var(--pn-warning); border-radius: 8px;">
+                <strong>⏳ Waiting for admin reply</strong>
+            </div>
+            {% endif %}
+        </div>
+        <div class="pn-modal-footer"><button class="pn-btn pn-btn-ghost" data-modal-close>Close</button></div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

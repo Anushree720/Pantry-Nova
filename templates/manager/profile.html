@@ -1,0 +1,59 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>My Profile</h1>
+<p style="color: var(--pn-text-secondary);">Manage your account and household settings.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="pn-grid pn-grid-2" style="margin-top: 18px;">
+        <div class="pn-card">
+            <h3 class="pn-card-title">🏠 Household Info</h3>
+            <div class="pn-form-group"><label class="pn-form-label">Household Name</label><input class="pn-form-control" name="household_name" value="{{ household.household_name }}"></div>
+            <div class="pn-form-group">
+                <label class="pn-form-label">Type</label>
+                <input class="pn-form-control" value="{{ household.get_household_type_display }}" readonly>
+            </div>
+            <div class="pn-form-group"><label class="pn-form-label">Address</label><textarea class="pn-form-control" name="address" rows="2">{{ household.address }}</textarea></div>
+            <div class="pn-grid pn-grid-2">
+                <div class="pn-form-group"><label class="pn-form-label">City</label><input class="pn-form-control" name="city" value="{{ household.city }}"></div>
+                <div class="pn-form-group"><label class="pn-form-label">PIN Code</label><input class="pn-form-control" name="pin_code" value="{{ household.pin_code }}"></div>
+            </div>
+            <div style="background: var(--pn-surface); padding: 12px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div><small style="color: var(--pn-text-secondary);">JOIN CODE</small><div style="font-family: 'Syne'; font-weight: 700; font-size: 1.4rem; letter-spacing: 4px;">{{ household.join_code }}</div></div>
+                <button type="button" class="pn-btn pn-btn-ghost pn-btn-sm" data-copy="{{ household.join_code }}"><i class="bi bi-clipboard"></i> Copy</button>
+            </div>
+        </div>
+
+        <div>
+            <div class="pn-card" style="margin-bottom: 18px;">
+                <h3 class="pn-card-title">👤 Personal Info</h3>
+                <div class="pn-form-group"><label class="pn-form-label">Full Name</label><input class="pn-form-control" name="full_name" value="{{ mgr.full_name }}"></div>
+                <div class="pn-form-group"><label class="pn-form-label">Email</label><input type="email" class="pn-form-control" name="email" value="{{ mgr.login.email }}"></div>
+                <div class="pn-form-group"><label class="pn-form-label">Phone</label><input class="pn-form-control" name="phone" value="{{ mgr.phone }}"></div>
+                <div class="pn-form-group"><label class="pn-form-label">Username</label><input class="pn-form-control" value="{{ mgr.login.username }}" readonly></div>
+            </div>
+
+            <div class="pn-card">
+                <h3 class="pn-card-title">🔒 Security & Notifications</h3>
+                <a href="{% url 'password_reset' %}" class="pn-btn pn-btn-ghost pn-btn-block" style="margin-bottom: 12px;">Change Password</a>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span>Email expiry alerts</span>
+                    <label class="pn-switch"><input type="checkbox" checked><span class="pn-switch-slider"></span></label>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span>Weekly impact summary</span>
+                    <label class="pn-switch"><input type="checkbox" checked><span class="pn-switch-slider"></span></label>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                    <span>Family member updates</span>
+                    <label class="pn-switch"><input type="checkbox"><span class="pn-switch-slider"></span></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="pn-btn pn-btn-accent" type="submit" style="margin-top: 18px;">🌿 Save Changes</button>
+</form>
+{% endblock %}

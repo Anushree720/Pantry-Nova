@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Join Household — Pantry Nova{% endblock %}
+
+{% block body %}
+<div class="pn-auth-centered">
+    <div class="pn-auth-card pn-card" style="padding: 36px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3rem;">🌿</div>
+            <h2>Join Your Household</h2>
+            <p style="color: var(--pn-text-secondary);">Sign up as a family member with your join code.</p>
+        </div>
+
+        <div style="background: var(--pn-surface); padding: 12px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 0.9rem; color: var(--pn-primary);">
+            <i class="bi bi-info-circle-fill"></i> Ask your Kitchen Manager for your household join code (6 characters).
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="pn-grid pn-grid-2">
+                <div class="pn-form-group"><label class="pn-form-label">Full Name</label><input class="pn-form-control" name="full_name" required></div>
+                <div class="pn-form-group"><label class="pn-form-label">Username</label><input class="pn-form-control" name="username" required></div>
+            </div>
+            <div class="pn-form-group"><label class="pn-form-label">Email</label><input type="email" class="pn-form-control" name="email" required></div>
+            <div class="pn-grid pn-grid-2">
+                <div class="pn-form-group"><label class="pn-form-label">Password</label><input type="password" class="pn-form-control" name="password" required minlength="6"></div>
+                <div class="pn-form-group"><label class="pn-form-label">Confirm Password</label><input type="password" class="pn-form-control" name="confirm_password" required></div>
+            </div>
+            <div class="pn-grid pn-grid-2">
+                <div class="pn-form-group"><label class="pn-form-label">Phone</label><input class="pn-form-control" name="phone"></div>
+                <div class="pn-form-group">
+                    <label class="pn-form-label">Household Join Code</label>
+                    <input class="pn-form-control" name="join_code" required style="text-transform: uppercase; letter-spacing: 4px; font-weight: 700; text-align: center;" maxlength="6" placeholder="ABC123">
+                </div>
+            </div>
+            <button class="pn-btn pn-btn-accent pn-btn-block" type="submit">🌿 Join Household</button>
+        </form>
+
+        <p style="margin-top: 18px; text-align: center; color: var(--pn-text-secondary);">
+            Already a member? <a href="{% url 'member_login' %}">Log in</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

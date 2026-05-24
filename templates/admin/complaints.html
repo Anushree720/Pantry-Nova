@@ -1,0 +1,68 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Complaints</h1>
+
+<div style="display: flex; gap: 8px; margin: 18px 0;">
+    <a href="?status=all" class="pn-chip {% if status_filter == 'all' %}active{% endif %}">All</a>
+    <a href="?status=pending" class="pn-chip {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+    <a href="?status=replied" class="pn-chip {% if status_filter == 'replied' %}active{% endif %}">Replied</a>
+</div>
+
+<div class="pn-card">
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>#</th><th>User</th><th>Complaint</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for c in items %}
+            <tr>
+                <td>{{ c.complaint_id }}</td>
+                <td>{{ c.user.username }}<br><small class="text-muted">{{ c.user.get_user_type_display }}</small></td>
+                <td>{{ c.complaint_text|truncatechars:80 }}</td>
+                <td>{{ c.complaint_date|date:"d M Y" }}</td>
+                <td>
+                    {% if c.status == 'pending' %}<span class="pn-badge pn-badge-warning">Pending</span>
+                    {% else %}<span class="pn-badge pn-badge-fresh">Replied</span>{% endif %}
+                </td>
+                <td>
+                    <button class="pn-btn pn-btn-accent pn-btn-sm" data-modal-open="reply{{ c.complaint_id }}">
+                        <i class="bi bi-eye"></i> View & Reply
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% for c in items %}
+<div class="pn-modal-overlay" id="reply{{ c.complaint_id }}">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3>Complaint #{{ c.complaint_id }}</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <form method="post" action="{% url 'admin_complaint_reply' c.complaint_id %}">
+            {% csrf_token %}
+            <div class="pn-modal-body">
+                <div style="margin-bottom: 12px; padding: 12px; background: var(--pn-surface); border-radius: 10px;">
+                    <strong>{{ c.user.username }}</strong> · {{ c.complaint_date|date:"d M Y" }}
+                    <p style="margin: 6px 0 0;">{{ c.complaint_text }}</p>
+                </div>
+                {% if c.reply_text %}
+                <div style="padding: 12px; background: rgba(82,183,136,0.1); border-left: 3px solid var(--pn-accent); border-radius: 8px;">
+                    <strong>Previous Reply:</strong>
+                    <p style="margin: 6px 0 0;">{{ c.reply_text }}</p>
+                </div>
+                {% endif %}
+                <div class="pn-form-group" style="margin-top: 16px;">
+                    <label class="pn-form-label">Reply</label>
+                    <textarea class="pn-form-control" name="reply_text" rows="4" required>{{ c.reply_text }}</textarea>
+                </div>
+            </div>
+            <div class="pn-modal-footer">
+                <button type="button" class="pn-btn pn-btn-ghost" data-modal-close>Cancel</button>
+                <button type="submit" class="pn-btn pn-btn-accent">🌿 Send Reply</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

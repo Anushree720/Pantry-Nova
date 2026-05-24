@@ -1,0 +1,172 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div><h1 style="margin: 0;">Pantry Inventory</h1><p style="color: var(--pn-text-secondary); margin: 4px 0;">Track everything in your kitchen.</p></div>
+    <button class="pn-btn pn-btn-accent" data-modal-open="itemModal" onclick="resetItemModal()">
+        <i class="bi bi-plus-circle-fill"></i> Add New Item
+    </button>
+</div>
+
+<div class="pn-card" style="margin-bottom: 18px;">
+    <form method="get" class="pn-grid pn-grid-4" style="gap: 12px;">
+        <input class="pn-form-control" name="q" value="{{ q }}" placeholder="🔍 Search items...">
+        <select class="pn-form-select" name="category" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for c in cats %}<option value="{{ c.id }}" {% if cat_filter == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+        </select>
+        <select class="pn-form-select" name="status" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+            <option value="expiring" {% if status_filter == 'expiring' %}selected{% endif %}>Expiring Soon</option>
+            <option value="fresh" {% if status_filter == 'fresh' %}selected{% endif %}>Fresh</option>
+        </select>
+        <select class="pn-form-select" name="storage" onchange="this.form.submit()">
+            <option value="">All Locations</option>
+            <option value="fridge" {% if storage_filter == 'fridge' %}selected{% endif %}>Fridge</option>
+            <option value="freezer" {% if storage_filter == 'freezer' %}selected{% endif %}>Freezer</option>
+            <option value="pantry" {% if storage_filter == 'pantry' %}selected{% endif %}>Pantry</option>
+            <option value="counter" {% if storage_filter == 'counter' %}selected{% endif %}>Counter</option>
+        </select>
+    </form>
+
+    <div style="margin-top: 14px; display: flex; gap: 8px;">
+        <button class="pn-btn pn-btn-ghost pn-btn-sm active" data-view-switch="table"><i class="bi bi-table"></i> Table</button>
+        <button class="pn-btn pn-btn-ghost pn-btn-sm" data-view-switch="cards"><i class="bi bi-grid-3x3-gap-fill"></i> Cards</button>
+    </div>
+</div>
+
+<div data-view="table">
+    <div class="pn-card">
+        <table class="pn-table pn-datatable">
+            <thead><tr><th>#</th><th>Item</th><th>Category</th><th>Quantity</th><th>Purchase</th><th>Expiry</th><th>Storage</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for i in items %}
+                <tr class="row-{% if i.expiry_status == 'expired' or i.expiry_status == 'critical' %}expired{% elif i.expiry_status == 'expiring_soon' %}warning{% else %}fresh{% endif %}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ i.item_name }}</strong>{% if i.notes %}<br><small class="text-muted">{{ i.notes|truncatechars:40 }}</small>{% endif %}</td>
+                    <td>{{ i.category.name|default:'—' }}</td>
+                    <td>{{ i.quantity|floatformat:'-2' }} {{ i.unit }}</td>
+                    <td>{{ i.purchase_date|date:"d M" }}</td>
+                    <td><span class="text-{{ i.expiry_color }}-pn">{{ i.expiry_date|date:"d M Y" }}</span></td>
+                    <td><span class="pn-badge pn-badge-info">{{ i.get_storage_location_display }}</span></td>
+                    <td><span class="pn-badge pn-badge-{{ i.expiry_color }}">{{ i.expiry_label }}</span></td>
+                    <td>
+                        <button class="pn-btn pn-btn-ghost pn-btn-sm"
+                            data-edit-modal="itemModal"
+                            data-item_id="{{ i.item_id }}"
+                            data-item_name="{{ i.item_name }}"
+                            data-category="{{ i.category.id|default:'' }}"
+                            data-quantity="{{ i.quantity }}"
+                            data-unit="{{ i.unit }}"
+                            data-purchase_date="{{ i.purchase_date|date:'Y-m-d' }}"
+                            data-expiry_date="{{ i.expiry_date|date:'Y-m-d' }}"
+                            data-storage_location="{{ i.storage_location }}"
+                            data-barcode="{{ i.barcode }}"
+                            data-notes="{{ i.notes }}"><i class="bi bi-pencil"></i></button>
+                        <a href="{% url 'manager_inventory_consume' i.item_id %}" class="pn-btn pn-btn-accent pn-btn-sm" data-confirm="Mark as consumed?"><i class="bi bi-check"></i></a>
+                        <a href="{% url 'manager_inventory_delete' i.item_id %}" class="pn-btn pn-btn-danger pn-btn-sm" data-confirm="Delete this item?"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9"><div class="pn-empty"><div class="icon">📦</div><p>No items match your filters</p></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div data-view="cards" style="display: none;">
+    <div class="pn-grid pn-grid-3">
+        {% for i in items %}
+        <div class="pn-item-card {% if i.expiry_status == 'expired' or i.expiry_status == 'critical' %}danger{% elif i.expiry_status == 'expiring_soon' %}warning{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h4 style="margin: 0;">{{ i.item_name }}</h4>
+                <span class="pn-badge pn-badge-{{ i.expiry_color }}">{{ i.expiry_label }}</span>
+            </div>
+            <div style="color: var(--pn-text-secondary); font-size: 0.85rem;">{{ i.category.name|default:'Uncategorized' }} · {{ i.get_storage_location_display }}</div>
+            <div style="margin: 12px 0; font-size: 1.4rem; font-weight: 600;">{{ i.quantity|floatformat:'-2' }} <small style="color: var(--pn-text-secondary); font-size: 0.85rem;">{{ i.unit }}</small></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--pn-text-secondary);">
+                <span>Expires: {{ i.expiry_date|date:"d M" }}</span>
+                <span class="text-{{ i.expiry_color }}-pn">{{ i.days_until_expiry }} days</span>
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 6px;">
+                <a href="{% url 'manager_inventory_consume' i.item_id %}" class="pn-btn pn-btn-accent pn-btn-sm" data-confirm="Mark as consumed?"><i class="bi bi-check-lg"></i></a>
+                <a href="{% url 'manager_inventory_delete' i.item_id %}" class="pn-btn pn-btn-danger pn-btn-sm" data-confirm="Delete?"><i class="bi bi-trash"></i></a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="pn-empty"><div class="icon">📦</div><p>No items match your filters</p></div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="pn-modal-overlay" id="itemModal">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3 id="itemModalTitle">Add New Item</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <form method="post" action="{% url 'manager_inventory_save' %}">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" value="">
+            <div class="pn-modal-body">
+                <div class="pn-form-group"><label class="pn-form-label">Item Name</label><input class="pn-form-control" name="item_name" required></div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Category</label>
+                        <select class="pn-form-select" name="category">
+                            <option value="">— Select —</option>
+                            {% for c in cats %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Storage Location</label>
+                        <select class="pn-form-select" name="storage_location">
+                            <option value="fridge">🧊 Fridge</option>
+                            <option value="freezer">❄️ Freezer</option>
+                            <option value="pantry" selected>🪟 Pantry</option>
+                            <option value="counter">🥖 Counter</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Quantity</label><input type="number" step="0.01" class="pn-form-control" name="quantity" required value="1"></div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Unit</label>
+                        <select class="pn-form-select" name="unit">
+                            <option value="kg">kg</option><option value="g">g</option>
+                            <option value="L">L</option><option value="ml">ml</option>
+                            <option value="pcs" selected>pcs</option><option value="packets">packets</option>
+                            <option value="other">other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Purchase Date</label><input type="date" class="pn-form-control" name="purchase_date" required></div>
+                    <div class="pn-form-group"><label class="pn-form-label">Expiry Date</label><input type="date" class="pn-form-control" name="expiry_date" required></div>
+                </div>
+                <div class="pn-form-group"><label class="pn-form-label">Barcode (optional)</label><input class="pn-form-control" name="barcode"></div>
+                <div class="pn-form-group"><label class="pn-form-label">Notes</label><textarea class="pn-form-control" name="notes" rows="2"></textarea></div>
+            </div>
+            <div class="pn-modal-footer">
+                <button type="button" class="pn-btn pn-btn-ghost" data-modal-close>Cancel</button>
+                <button type="submit" class="pn-btn pn-btn-accent">🌿 Save Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function resetItemModal(){
+    const m = document.getElementById('itemModal');
+    m.querySelector('input[name="item_id"]').value = '';
+    m.querySelector('input[name="item_name"]').value = '';
+    m.querySelector('input[name="quantity"]').value = '1';
+    m.querySelector('input[name="purchase_date"]').valueAsDate = new Date();
+    const exp = new Date(); exp.setDate(exp.getDate() + 7);
+    m.querySelector('input[name="expiry_date"]').valueAsDate = exp;
+    m.querySelector('input[name="barcode"]').value = '';
+    m.querySelector('textarea[name="notes"]').value = '';
+    document.getElementById('itemModalTitle').textContent = 'Add New Item';
+}
+</script>
+{% endblock %}

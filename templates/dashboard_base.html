@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="pn-layout">
+    <aside class="pn-sidebar" id="pnSidebar">
+        {% block sidebar %}{% endblock %}
+    </aside>
+
+    <main class="pn-main">
+        <nav class="pn-navbar">
+            <button class="pn-sidebar-toggle" id="sidebarToggle"><i class="bi bi-list"></i></button>
+            <h2>{% block page_title %}{{ page_title|default:"Pantry Nova" }}{% endblock %}</h2>
+            <div class="pn-navbar-actions">
+                {% if session_user_type in 'manager,member' %}
+                <a href="{% url 'chatbot' %}" class="pn-icon-btn" title="Nova AI">
+                    <i class="bi bi-robot"></i>
+                </a>
+                {% endif %}
+                {% if session_user_type == 'manager' or session_user_type == 'member' %}
+                <a href="{% if session_user_type == 'manager' %}{% url 'manager_expiry' %}{% else %}{% url 'member_alerts' %}{% endif %}"
+                   class="pn-icon-btn" title="Alerts">
+                    <i class="bi bi-bell-fill"></i>
+                    {% if expiry_alert_count %}<span class="badge-dot">{{ expiry_alert_count }}</span>{% endif %}
+                </a>
+                {% endif %}
+                {% if session_user_type == 'admin' and pending_complaints_count %}
+                <a href="{% url 'admin_complaints' %}?status=pending" class="pn-icon-btn" title="Pending complaints">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span class="badge-dot">{{ pending_complaints_count }}</span>
+                </a>
+                {% endif %}
+                <button class="pn-icon-btn" id="themeToggle" title="Toggle theme">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <a href="{% url 'logout' %}" class="pn-icon-btn" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+            </div>
+        </nav>
+
+        <div class="pn-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+{% endblock %}

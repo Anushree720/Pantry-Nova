@@ -1,0 +1,23 @@
+{% load static %}
+<div class="pn-sidebar-brand">
+    <div class="pn-logo">🌿</div>
+    <h1>Pantry Nova</h1>
+</div>
+<div class="pn-sidebar-label">Admin Panel</div>
+<ul class="pn-sidebar-nav">
+    <li><a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-fill"></i> Dashboard</a></li>
+    <li><a href="{% url 'admin_ingredients' %}" class="{% if request.resolver_match.url_name == 'admin_ingredients' %}active{% endif %}">
+        <i class="bi bi-egg-fill"></i> Ingredient References</a></li>
+    <li><a href="{% url 'admin_households' %}" class="{% if 'household' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-house-door-fill"></i> Households</a></li>
+    <li><a href="{% url 'admin_telemetry' %}" class="{% if request.resolver_match.url_name == 'admin_telemetry' %}active{% endif %}">
+        <i class="bi bi-graph-up-arrow"></i> System Telemetry</a></li>
+    <li><a href="{% url 'admin_complaints' %}" class="{% if request.resolver_match.url_name == 'admin_complaints' %}active{% endif %}">
+        <i class="bi bi-chat-square-text-fill"></i> Complaints
+        {% if pending_complaints_count %}<span class="badge bg-danger">{{ pending_complaints_count }}</span>{% endif %}
+    </a></li>
+    <li><a href="{% url 'admin_feedback' %}" class="{% if request.resolver_match.url_name == 'admin_feedback' %}active{% endif %}">
+        <i class="bi bi-emoji-smile-fill"></i> Feedback</a></li>
+    <li><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+</ul>

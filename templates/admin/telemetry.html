@@ -1,0 +1,30 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>System Telemetry</h1>
+<p style="color: var(--pn-text-secondary);">Real-time performance and usage metrics across Pantry Nova.</p>
+
+<div class="pn-grid pn-grid-4" style="margin: 18px 0;">
+    <div class="pn-kpi"><div class="pn-kpi-icon">📦</div><div class="pn-kpi-value" data-counter="{{ total_items }}">0</div><div class="pn-kpi-label">Total Items</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">♻️</div><div class="pn-kpi-value">{{ total_waste_kg }}</div><div class="pn-kpi-label">Total Waste (kg)</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-icon">🥕</div><div class="pn-kpi-value" data-counter="{{ total_categories }}">0</div><div class="pn-kpi-label">Categories</div></div>
+    <div class="pn-kpi"><div class="pn-kpi-icon">👥</div><div class="pn-kpi-value" data-counter="{{ daily_active }}">0</div><div class="pn-kpi-label">Active Users</div></div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div class="pn-card"><h3 class="pn-card-title">Daily Active Users (14 days)</h3><canvas id="dauChart" height="220"></canvas></div>
+    <div class="pn-card"><h3 class="pn-card-title">Items by Category</h3><canvas id="catChart" height="220"></canvas></div>
+    <div class="pn-card"><h3 class="pn-card-title">Household Types</h3><canvas id="htChart" height="220"></canvas></div>
+    <div class="pn-card"><h3 class="pn-card-title">Waste Trend</h3><canvas id="wasteChart" height="220"></canvas></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+new Chart(document.getElementById('dauChart'),{type:'line',data:{labels:{{ dau_labels|safe }},datasets:[{label:'Users',data:{{ dau_data|safe }},borderColor:'#52B788',backgroundColor:'rgba(82,183,136,0.15)',fill:true,tension:0.4}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('catChart'),{type:'bar',data:{labels:{{ cat_labels|safe }},datasets:[{label:'Items',data:{{ cat_data|safe }},backgroundColor:'#1B4332',borderRadius:6}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('htChart'),{type:'doughnut',data:{labels:{{ ht_labels|safe }},datasets:[{data:{{ ht_data|safe }},backgroundColor:['#52B788','#1B4332','#F4A261','#E63946','#74C69D']}]},options:{responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('wasteChart'),{type:'line',data:{labels:{{ waste_labels|safe }},datasets:[{label:'Waste',data:{{ waste_data|safe }},borderColor:'#F4A261',backgroundColor:'rgba(244,162,97,0.15)',fill:true,tension:0.4}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+</script>
+{% endblock %}

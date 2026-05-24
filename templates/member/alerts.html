@@ -1,0 +1,57 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Notification Alerts</h1>
+<p style="color: var(--pn-text-secondary);">Stay on top of items that need attention.</p>
+
+{% if not critical and not warning and not info %}
+<div class="pn-empty" style="margin-top: 40px;">
+    <div class="icon">🌿</div>
+    <h3>Your pantry looks great!</h3>
+    <p>No urgent alerts. Keep up the great work!</p>
+</div>
+{% endif %}
+
+{% if critical %}
+<h3 style="margin-top: 24px;">🔴 Critical — Already Expired</h3>
+<div class="pn-grid pn-grid-3">
+    {% for i in critical %}
+    <div class="pn-item-card danger" data-aos="fade-up">
+        <strong>{{ i.item_name }}</strong>
+        <div style="font-size: 0.85rem; color: var(--pn-text-secondary); margin: 4px 0;">{{ i.quantity }} {{ i.unit }} · {{ i.expiry_date|date:"d M" }}</div>
+        <span class="pn-badge pn-badge-danger">Expired {{ i.days_until_expiry }} days ago</span>
+        <button class="pn-btn pn-btn-warning pn-btn-block pn-btn-sm" style="margin-top: 10px;" data-confirm="Notify Kitchen Manager about this item?">
+            <i class="bi bi-bell-fill"></i> Notify Manager
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if warning %}
+<h3 style="margin-top: 24px;">🟠 Warning — This Week</h3>
+<div class="pn-grid pn-grid-3">
+    {% for i in warning %}
+    <div class="pn-item-card warning" data-aos="fade-up">
+        <strong>{{ i.item_name }}</strong>
+        <div style="font-size: 0.85rem; color: var(--pn-text-secondary); margin: 4px 0;">{{ i.quantity }} {{ i.unit }} · {{ i.expiry_date|date:"d M" }}</div>
+        <span class="pn-badge pn-badge-warning">{{ i.days_until_expiry }} days left</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if info %}
+<h3 style="margin-top: 24px;">🟢 Info — This Month</h3>
+<div class="pn-grid pn-grid-3">
+    {% for i in info %}
+    <div class="pn-item-card" data-aos="fade-up">
+        <strong>{{ i.item_name }}</strong>
+        <div style="font-size: 0.85rem; color: var(--pn-text-secondary); margin: 4px 0;">{{ i.quantity }} {{ i.unit }} · {{ i.expiry_date|date:"d M" }}</div>
+        <span class="pn-badge pn-badge-fresh">{{ i.days_until_expiry }} days left</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

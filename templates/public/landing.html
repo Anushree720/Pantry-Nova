@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Pantry Nova — Stop Wasting. Start Saving.{% endblock %}
+
+{% block body %}
+<header style="background: var(--pn-primary); padding: 18px 40px; position: sticky; top: 0; z-index: 100;">
+    <div style="display: flex; align-items: center; max-width: 1280px; margin: 0 auto;">
+        <a href="{% url 'landing' %}" style="display: flex; align-items: center; gap: 10px; color: #fff; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem;">
+            <span style="background: var(--pn-accent); width: 36px; height: 36px; border-radius: 12px 8px 8px 8px; display: inline-flex; align-items: center; justify-content: center;">🌿</span>
+            Pantry Nova
+        </a>
+        <nav style="margin-left: auto; display: flex; gap: 20px; align-items: center;">
+            <a href="#features" style="color: rgba(255,255,255,0.85);">Features</a>
+            <a href="#impact" style="color: rgba(255,255,255,0.85);">Impact</a>
+            <a href="{% url 'manager_login' %}" class="pn-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1.5px solid rgba(255,255,255,0.3);">Login</a>
+            <a href="{% url 'manager_register' %}" class="pn-btn pn-btn-accent">Get Started</a>
+        </nav>
+    </div>
+</header>
+
+<section class="pn-hero">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 2;">
+        <div>
+            <div style="display:inline-block; background: rgba(82,183,136,0.2); color: var(--pn-accent); padding: 6px 16px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; margin-bottom: 18px;" data-gsap="hero-cta">
+                🌱 Smart Pantry Management
+            </div>
+            <h1 data-gsap="hero-title">Stop Wasting.<br>Start Saving.</h1>
+            <p data-gsap="hero-sub">AI-powered pantry management for smarter households. Track ingredients, get expiry alerts, and reduce food waste — all in one centralized platform.</p>
+            <div style="display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap;" data-gsap="hero-cta">
+                <a href="{% url 'manager_register' %}" class="pn-btn pn-btn-accent" style="font-size: 1rem;">
+                    Get Started Free <i class="bi bi-arrow-right"></i>
+                </a>
+                <a href="{% url 'manager_register' %}" class="pn-btn" style="background: transparent; color: #fff; border: 1.5px solid #fff; font-size: 1rem;">
+                    For Restaurants & Hotels
+                </a>
+            </div>
+        </div>
+        <div data-aos="fade-left" data-aos-delay="200">
+            <div class="pn-pantry-shelf">
+                <div class="shelf-row">
+                    <div class="item">🍅</div><div class="item">🥬</div><div class="item">🥕</div>
+                    <div class="item">🧅</div><div class="item">🥔</div>
+                </div>
+                <div class="shelf-row">
+                    <div class="item">🍞</div><div class="item">🥛</div><div class="item">🧀</div>
+                    <div class="item">🥚</div><div class="item">🍯</div>
+                </div>
+                <div class="shelf-row">
+                    <div class="item">🍎</div><div class="item">🍌</div><div class="item">🍇</div>
+                    <div class="item">🥦</div><div class="item">🌽</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="max-width: 1280px; margin: 60px auto 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; position: relative; z-index: 2;">
+        <div class="pn-stat" style="color: #fff;"><div class="pn-stat-value" data-counter="50000">0</div><div class="pn-stat-label" style="color: rgba(255,255,255,0.7);">Items Tracked</div></div>
+        <div class="pn-stat" style="color: #fff;"><div class="pn-stat-value" data-counter="12000">0</div><div class="pn-stat-label" style="color: rgba(255,255,255,0.7);">kg Food Saved</div></div>
+        <div class="pn-stat" style="color: #fff;"><div class="pn-stat-value" data-counter="8000">0</div><div class="pn-stat-label" style="color: rgba(255,255,255,0.7);">Families</div></div>
+        <div class="pn-stat" style="color: #fff;"><div class="pn-stat-value" data-counter="30">0</div><div class="pn-stat-label" style="color: rgba(255,255,255,0.7);">% Waste Reduced</div></div>
+    </div>
+</section>
+
+<section class="pn-section" style="background: var(--pn-bg);">
+    <div style="max-width: 1280px; margin: 0 auto;">
+        <h2 class="pn-section-title">How It Works</h2>
+        <p class="pn-section-subtitle">Three simple steps to a smarter, waste-free kitchen.</p>
+        <div class="pn-grid pn-grid-3">
+            <div class="pn-feature-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="icon-circle"><i class="bi bi-box-seam-fill"></i></div>
+                <h4>1. Track Items</h4>
+                <p>Add your groceries with expiry dates, quantities and storage locations. Pantry Nova builds your smart inventory.</p>
+            </div>
+            <div class="pn-feature-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="icon-circle"><i class="bi bi-bell-fill"></i></div>
+                <h4>2. Get AI Alerts</h4>
+                <p>Receive timely notifications about items nearing expiry. Nova AI suggests recipes to use them up creatively.</p>
+            </div>
+            <div class="pn-feature-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="icon-circle"><i class="bi bi-piggy-bank-fill"></i></div>
+                <h4>3. Save Food + Money</h4>
+                <p>Reduce food waste, lower grocery bills, and shrink your carbon footprint — all while eating better.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pn-section" id="features" style="background: var(--pn-surface);">
+    <div style="max-width: 1280px; margin: 0 auto;">
+        <h2 class="pn-section-title">Everything You Need</h2>
+        <p class="pn-section-subtitle">Six powerful features in one beautiful platform.</p>
+        <div class="pn-grid pn-grid-3">
+            <div class="pn-feature-card" data-aos="zoom-in"><div class="icon-circle">📦</div><h4>Smart Inventory</h4><p>Track every ingredient with quantity, expiry, storage location and category. View it all in a stunning dashboard.</p></div>
+            <div class="pn-feature-card" data-aos="zoom-in" data-aos-delay="100"><div class="icon-circle">🔔</div><h4>Expiry Alerts</h4><p>Color-coded alerts: red for expired, amber for expiring soon, green for fresh. Never lose food again.</p></div>
+            <div class="pn-feature-card" data-aos="zoom-in" data-aos-delay="200"><div class="icon-circle">🤖</div><h4>Nova AI Recipes</h4><p>Powered by Google Gemini. Get creative recipes using your expiring items in seconds.</p></div>
+            <div class="pn-feature-card" data-aos="zoom-in"><div class="icon-circle">📊</div><h4>Waste Analytics</h4><p>Beautiful charts showing waste by category, week, and cost. Track CO₂ impact and savings.</p></div>
+            <div class="pn-feature-card" data-aos="zoom-in" data-aos-delay="100"><div class="icon-circle">🛒</div><h4>Smart Shopping Lists</h4><p>Auto-generated when stock runs low. Share via WhatsApp or export as PDF.</p></div>
+            <div class="pn-feature-card" data-aos="zoom-in" data-aos-delay="200"><div class="icon-circle">👨‍👩‍👧</div><h4>Family Access</h4><p>Invite family members with a join code. Everyone stays in sync with the pantry.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="pn-section" style="background: var(--pn-bg);">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+        <div data-aos="fade-right">
+            <h2 style="font-size: 2.4rem;">For Homes</h2>
+            <p style="color: var(--pn-text-secondary); font-size: 1.05rem;">Family-friendly pantry management with shared access, smart alerts, and meal planning.</p>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Track everyone's groceries in one place</li>
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Get notified before food expires</li>
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Generate weekly shopping lists automatically</li>
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> See savings and impact in real time</li>
+            </ul>
+            <a href="{% url 'manager_register' %}" class="pn-btn pn-btn-primary">Start Tracking</a>
+        </div>
+        <div data-aos="fade-left">
+            <div class="pn-card" style="padding: 30px;">
+                <h4>🏠 Family Home Setup</h4>
+                <div class="pn-divider"></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Active Items</span><strong class="text-accent-pn">128</strong></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Expiring This Week</span><strong class="text-warning-pn">7</strong></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Family Members</span><strong>4</strong></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Money Saved (Year)</span><strong class="text-accent-pn">₹18,400</strong></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pn-section" style="background: var(--pn-surface);">
+    <div style="max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+        <div data-aos="fade-right" style="order: 2;">
+            <div class="pn-card" style="padding: 30px;">
+                <h4>🍽️ Restaurant Insights</h4>
+                <div class="pn-divider"></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>SKU Tracked</span><strong>2,400</strong></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Daily Waste Logs</span><strong class="text-warning-pn">12</strong></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>CO₂ Reduced (Mo)</span><strong class="text-accent-pn">412 kg</strong></div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Cost Saved (Mo)</span><strong class="text-accent-pn">₹84,000</strong></div>
+            </div>
+        </div>
+        <div data-aos="fade-left" style="order: 1;">
+            <h2 style="font-size: 2.4rem;">For Restaurants & Hotels</h2>
+            <p style="color: var(--pn-text-secondary); font-size: 1.05rem;">Enterprise-grade ingredient tracking, waste analytics and supplier-ready reports.</p>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Multi-staff role-based access</li>
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Bulk import from CSV / barcode scanning</li>
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Detailed waste reports with cost breakdowns</li>
+                <li style="margin: 12px 0;"><span class="text-accent-pn">🌿</span> Sustainability metrics for ESG reporting</li>
+            </ul>
+            <a href="{% url 'manager_register' %}" class="pn-btn pn-btn-primary">For Business</a>
+        </div>
+    </div>
+</section>
+
+<section class="pn-section" id="impact" style="background: var(--pn-primary); color: #fff;">
+    <div style="max-width: 1280px; margin: 0 auto; text-align: center;">
+        <h2 class="pn-section-title" style="color: #fff;">Real-World Impact</h2>
+        <p class="pn-section-subtitle" style="color: rgba(255,255,255,0.8);">Together, we're building a more sustainable food system.</p>
+        <div class="pn-grid pn-grid-3" style="margin-top: 40px;">
+            <div data-aos="zoom-in"><div class="pn-stat-value" style="font-size: 4rem; color: var(--pn-accent);" data-counter="12000">0</div><div style="color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">kg of food saved</div></div>
+            <div data-aos="zoom-in" data-aos-delay="100"><div class="pn-stat-value" style="font-size: 4rem; color: var(--pn-accent);" data-counter="32000">0</div><div style="color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">kg CO₂ reduced</div></div>
+            <div data-aos="zoom-in" data-aos-delay="200"><div class="pn-stat-value" style="font-size: 4rem; color: var(--pn-accent);" data-counter="2400000">0</div><div style="color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;">₹ saved by families</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="pn-section" style="background: var(--pn-bg);">
+    <div style="max-width: 1280px; margin: 0 auto;">
+        <h2 class="pn-section-title">What Users Say</h2>
+        <div class="pn-grid pn-grid-3">
+            <div class="pn-card" data-aos="fade-up">
+                <div style="font-size: 1.4rem; color: var(--pn-warning);">★★★★★</div>
+                <p>"Pantry Nova saved my groceries — and my budget. The expiry alerts are a game-changer for our family of 5."</p>
+                <strong>— Priya M., Bengaluru</strong>
+            </div>
+            <div class="pn-card" data-aos="fade-up" data-aos-delay="100">
+                <div style="font-size: 1.4rem; color: var(--pn-warning);">★★★★★</div>
+                <p>"Nova AI suggested recipes for our leftover veggies. Restaurant-grade waste tracking made simple."</p>
+                <strong>— Chef Arjun, The Green Bowl</strong>
+            </div>
+            <div class="pn-card" data-aos="fade-up" data-aos-delay="200">
+                <div style="font-size: 1.4rem; color: var(--pn-warning);">★★★★★</div>
+                <p>"We cut food waste by 40% in our hotel kitchen. The analytics are stunning and easy to share."</p>
+                <strong>— Hotel Rosewood Manager</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer style="background: var(--pn-primary-dark); color: #fff; padding: 40px;">
+    <div style="max-width: 1280px; margin: 0 auto; text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px;">
+            <span style="background: var(--pn-accent); width: 32px; height: 32px; border-radius: 12px 8px 8px 8px; display: inline-flex; align-items: center; justify-content: center;">🌿</span>
+            <strong style="font-family: 'Syne', sans-serif; font-size: 1.2rem;">Pantry Nova</strong>
+        </div>
+        <p style="color: rgba(255,255,255,0.7); margin: 8px 0;">AI-powered household food inventory & waste reduction platform</p>
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">© 2026 Pantry Nova · IGNOU BCA Final Year Project · Made with 🌱</p>
+    </div>
+</footer>
+{% endblock %}

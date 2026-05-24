@@ -1,0 +1,34 @@
+{% load static %}
+<div class="pn-sidebar-brand">
+    <div class="pn-logo">🌿</div>
+    <h1>Pantry Nova</h1>
+</div>
+{% if session_household %}
+<div class="pn-sidebar-household">
+    <div class="small">🏠 Household</div>
+    <div class="name">{{ session_household.household_name }}</div>
+</div>
+{% endif %}
+<ul class="pn-sidebar-nav">
+    <li><a href="{% url 'manager_dashboard' %}" class="{% if request.resolver_match.url_name == 'manager_dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-fill"></i> Dashboard</a></li>
+    <li><a href="{% url 'manager_inventory' %}" class="{% if request.resolver_match.url_name == 'manager_inventory' %}active{% endif %}">
+        <i class="bi bi-box-seam-fill"></i> Inventory</a></li>
+    <li><a href="{% url 'manager_expiry' %}" class="{% if request.resolver_match.url_name == 'manager_expiry' %}active{% endif %}">
+        <i class="bi bi-bell-fill"></i> Expiry Alerts
+        {% if expiry_alert_count %}<span class="badge bg-danger">{{ expiry_alert_count }}</span>{% endif %}
+    </a></li>
+    <li><a href="{% url 'manager_shopping' %}" class="{% if request.resolver_match.url_name == 'manager_shopping' %}active{% endif %}">
+        <i class="bi bi-cart-fill"></i> Shopping List</a></li>
+    <li><a href="{% url 'manager_waste' %}" class="{% if request.resolver_match.url_name == 'manager_waste' %}active{% endif %}">
+        <i class="bi bi-recycle"></i> Waste Log</a></li>
+    <li><a href="{% url 'manager_analytics' %}" class="{% if request.resolver_match.url_name == 'manager_analytics' %}active{% endif %}">
+        <i class="bi bi-bar-chart-fill"></i> Analytics</a></li>
+    <li><a href="{% url 'manager_family' %}" class="{% if request.resolver_match.url_name == 'manager_family' %}active{% endif %}">
+        <i class="bi bi-people-fill"></i> Family Members</a></li>
+    <li><a href="{% url 'chatbot' %}" class="{% if request.resolver_match.url_name == 'chatbot' %}active{% endif %}">
+        <i class="bi bi-robot"></i> Nova AI</a></li>
+    <li><a href="{% url 'manager_profile' %}" class="{% if request.resolver_match.url_name == 'manager_profile' %}active{% endif %}">
+        <i class="bi bi-person-circle"></i> Profile</a></li>
+    <li><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+</ul>

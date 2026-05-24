@@ -1,0 +1,44 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>My Profile</h1>
+<p style="color: var(--pn-text-secondary);">Manage your personal information.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="pn-grid pn-grid-2" style="margin-top: 18px;">
+        <div class="pn-card">
+            <h3 class="pn-card-title">👤 Personal Info</h3>
+            <div style="text-align: center; padding: 16px;">
+                <div style="width: 80px; height: 80px; background: var(--pn-accent); color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700;">
+                    {{ mem.full_name|slice:":1"|upper }}
+                </div>
+                <h4 style="margin: 12px 0 4px;">{{ mem.full_name }}</h4>
+                <p style="color: var(--pn-text-secondary);">@{{ mem.login.username }}</p>
+            </div>
+            <div class="pn-form-group"><label class="pn-form-label">Full Name</label><input class="pn-form-control" name="full_name" value="{{ mem.full_name }}"></div>
+            <div class="pn-form-group"><label class="pn-form-label">Email</label><input type="email" class="pn-form-control" name="email" value="{{ mem.login.email }}"></div>
+            <div class="pn-form-group"><label class="pn-form-label">Phone</label><input class="pn-form-control" name="phone" value="{{ mem.phone }}"></div>
+            <div class="pn-form-group"><label class="pn-form-label">Username</label><input class="pn-form-control" value="{{ mem.login.username }}" readonly></div>
+            <button type="submit" class="pn-btn pn-btn-accent">🌿 Save Changes</button>
+        </div>
+
+        <div>
+            <div class="pn-card" style="margin-bottom: 18px;">
+                <h3 class="pn-card-title">🏠 Household</h3>
+                <p><strong>{{ household.household_name }}</strong></p>
+                <p style="color: var(--pn-text-secondary); font-size: 0.9rem;">{{ household.address }}, {{ household.city }} - {{ household.pin_code }}</p>
+                <span class="pn-badge pn-badge-info">{{ household.get_household_type_display }}</span>
+                <div style="margin-top: 10px; font-size: 0.82rem; color: var(--pn-text-secondary);">Member since {{ mem.joined_at|date:"d M Y" }}</div>
+            </div>
+
+            <div class="pn-card">
+                <h3 class="pn-card-title">🔒 Security</h3>
+                <a href="{% url 'password_reset' %}" class="pn-btn pn-btn-ghost pn-btn-block" style="margin-bottom: 12px;">Change Password</a>
+                <a href="{% url 'logout' %}" class="pn-btn pn-btn-danger pn-btn-block">Logout</a>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

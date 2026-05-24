@@ -1,0 +1,48 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Kitchen Stock</h1>
+<p style="color: var(--pn-text-secondary);">View what's available in the family kitchen.</p>
+
+<div class="pn-card" style="margin: 18px 0;">
+    <form method="get" class="pn-grid pn-grid-3" style="gap: 12px;">
+        <input class="pn-form-control" name="q" value="{{ q }}" placeholder="🔍 Search items...">
+        <select class="pn-form-select" name="category" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for c in cats %}<option value="{{ c.id }}" {% if cat_filter == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+        </select>
+        <select class="pn-form-select" name="storage" onchange="this.form.submit()">
+            <option value="">All Locations</option>
+            <option value="fridge" {% if storage_filter == 'fridge' %}selected{% endif %}>Fridge</option>
+            <option value="freezer" {% if storage_filter == 'freezer' %}selected{% endif %}>Freezer</option>
+            <option value="pantry" {% if storage_filter == 'pantry' %}selected{% endif %}>Pantry</option>
+            <option value="counter" {% if storage_filter == 'counter' %}selected{% endif %}>Counter</option>
+        </select>
+    </form>
+</div>
+
+<div class="pn-grid pn-grid-3">
+    {% for i in items %}
+    <div class="pn-item-card {% if i.expiry_status == 'expired' or i.expiry_status == 'critical' %}danger{% elif i.expiry_status == 'expiring_soon' %}warning{% endif %}" data-aos="fade-up">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h4 style="margin: 0;">{{ i.item_name }}</h4>
+            <span class="pn-badge pn-badge-{{ i.expiry_color }}">{{ i.expiry_label }}</span>
+        </div>
+        <div style="color: var(--pn-text-secondary); font-size: 0.85rem;">{{ i.category.name|default:'Uncategorized' }} · {{ i.get_storage_location_display }}</div>
+        <div style="margin: 12px 0; font-size: 1.4rem; font-weight: 600;">
+            {{ i.quantity|floatformat:'-2' }} <small style="color: var(--pn-text-secondary); font-size: 0.85rem;">{{ i.unit }}</small>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--pn-text-secondary); margin-bottom: 12px;">
+            <span><i class="bi bi-calendar-event"></i> {{ i.expiry_date|date:"d M Y" }}</span>
+            <span class="text-{{ i.expiry_color }}-pn"><strong>{{ i.days_until_expiry }} days</strong></span>
+        </div>
+        <a href="{% url 'member_consumption' %}?item={{ i.item_id }}" class="pn-btn pn-btn-accent pn-btn-block pn-btn-sm">
+            <i class="bi bi-cup-hot-fill"></i> Use This Item
+        </a>
+    </div>
+    {% empty %}
+    <div class="pn-empty" style="grid-column: 1 / -1;"><div class="icon">📦</div><p>No items in stock yet.</p></div>
+    {% endfor %}
+</div>
+{% endblock %}

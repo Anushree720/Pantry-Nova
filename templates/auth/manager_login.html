@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Login — Pantry Nova{% endblock %}
+
+{% block body %}
+<div class="pn-auth-page">
+    <div class="pn-auth-side">
+        <div style="position: relative; z-index: 2;">
+            <a href="{% url 'landing' %}" style="color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 8px; margin-bottom: 30px; font-size: 0.9rem;">
+                <i class="bi bi-arrow-left"></i> Back to home
+            </a>
+            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 30px;">
+                <div style="background: var(--pn-accent); width: 48px; height: 48px; border-radius: 12px 8px 8px 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem;">🌿</div>
+                <span style="font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700;">Pantry Nova</span>
+            </div>
+            <h1>Manage Your<br>Pantry Smarter</h1>
+            <p>Welcome back. Let's reduce waste and save what matters today.</p>
+            <div style="margin-top: 40px; font-size: 6rem;">🥬🍅🥕</div>
+        </div>
+    </div>
+
+    <div class="pn-auth-form">
+        <div class="pn-auth-card">
+            <h2>Kitchen Manager Login</h2>
+            <p style="color: var(--pn-text-secondary);">Welcome back to your smart pantry.</p>
+
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+                <div class="pn-form-group">
+                    <label class="pn-form-label">Username</label>
+                    <input class="pn-form-control" name="username" required autofocus>
+                </div>
+                <div class="pn-form-group">
+                    <label class="pn-form-label">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="pn-form-control" name="password" id="pwField" required>
+                        <button type="button" data-toggle-password="#pwField" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--pn-text-secondary); cursor: pointer;"><i class="bi bi-eye"></i></button>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <label style="font-size: 0.9rem;"><input type="checkbox" name="remember"> Remember me</label>
+                    <a href="{% url 'password_reset' %}" style="font-size: 0.9rem;">Forgot Password?</a>
+                </div>
+                <button class="pn-btn pn-btn-primary pn-btn-block" type="submit">Log In</button>
+            </form>
+
+            <div style="text-align: center; margin: 18px 0; color: var(--pn-text-secondary);">— or —</div>
+            <a href="{% url 'member_login' %}" class="pn-btn pn-btn-ghost pn-btn-block">Login as Family Member</a>
+            <a href="{% url 'admin_login' %}" class="pn-btn pn-btn-ghost pn-btn-block" style="margin-top: 8px;">Admin Login</a>
+
+            <p style="margin-top: 20px; text-align: center; color: var(--pn-text-secondary);">
+                New here? <a href="{% url 'manager_register' %}">Create an account</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+{% if messages %}
+    {% for message in messages %}{% if message.tags == 'error' %}
+    document.getElementById('loginForm').classList.add('shake');
+    setTimeout(()=>document.getElementById('loginForm').classList.remove('shake'), 500);
+    {% endif %}{% endfor %}
+{% endif %}
+</script>
+{% endblock %}

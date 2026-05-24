@@ -1,0 +1,62 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'admin_households' %}" style="color: var(--pn-text-secondary);"><i class="bi bi-arrow-left"></i> Back to Households</a>
+<h1 style="margin-top: 8px;">{{ h.household_name }}</h1>
+
+<div class="pn-grid pn-grid-3" style="margin-bottom: 24px;">
+    <div class="pn-kpi"><div class="pn-kpi-value">{{ h.member_count }}</div><div class="pn-kpi-label">Members</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-value">{{ items_count }}</div><div class="pn-kpi-label">Active Items</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-value">{{ waste_count }}</div><div class="pn-kpi-label">Waste Logs</div></div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div class="pn-card">
+        <h3 class="pn-card-title">Household Details</h3>
+        <table class="pn-table">
+            <tr><td><strong>Type</strong></td><td>{{ h.get_household_type_display }}</td></tr>
+            <tr><td><strong>Address</strong></td><td>{{ h.address }}</td></tr>
+            <tr><td><strong>City / PIN</strong></td><td>{{ h.city }} — {{ h.pin_code }}</td></tr>
+            <tr><td><strong>Join Code</strong></td><td><code>{{ h.join_code }}</code></td></tr>
+            <tr><td><strong>Created</strong></td><td>{{ h.created_at|date:"d M Y" }}</td></tr>
+            <tr><td><strong>Status</strong></td><td>
+                {% if h.is_suspended %}<span class="pn-badge pn-badge-danger">Suspended</span>
+                {% elif h.is_verified %}<span class="pn-badge pn-badge-fresh">Verified</span>
+                {% else %}<span class="pn-badge pn-badge-warning">Pending Verification</span>{% endif %}
+            </td></tr>
+        </table>
+    </div>
+    <div class="pn-card">
+        <h3 class="pn-card-title">Family Members</h3>
+        {% if manager %}
+            <div style="padding: 10px; background: var(--pn-surface); border-radius: 10px; margin-bottom: 10px;">
+                <strong>{{ manager.full_name }}</strong>
+                <span class="pn-badge pn-badge-info" style="margin-left: 8px;">Kitchen Manager</span>
+                <div style="font-size: 0.85rem; color: var(--pn-text-secondary);">{{ manager.login.email }} · {{ manager.phone }}</div>
+            </div>
+        {% endif %}
+        {% for m in members %}
+            <div style="padding: 10px; border-bottom: 1px solid var(--pn-border);">
+                <strong>{{ m.full_name }}</strong>
+                <div style="font-size: 0.85rem; color: var(--pn-text-secondary);">{{ m.login.email }} · joined {{ m.joined_at|date:"d M Y" }}</div>
+            </div>
+        {% empty %}
+            <div class="pn-empty"><div class="icon">👤</div><p>No family members yet.</p></div>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="margin-top: 24px; display: flex; gap: 10px;">
+    {% if not h.is_verified %}
+    <a href="{% url 'admin_household_verify' h.household_id %}" class="pn-btn pn-btn-accent" data-confirm="Verify this household?">
+        <i class="bi bi-check-lg"></i> Verify
+    </a>
+    {% endif %}
+    {% if not h.is_suspended %}
+    <a href="{% url 'admin_household_suspend' h.household_id %}" class="pn-btn pn-btn-danger" data-confirm="Suspend this household?">
+        <i class="bi bi-x-lg"></i> Suspend
+    </a>
+    {% endif %}
+</div>
+{% endblock %}

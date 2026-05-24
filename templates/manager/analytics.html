@@ -1,0 +1,46 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div><h1 style="margin: 0;">Analytics & Reports</h1><p style="color: var(--pn-text-secondary); margin: 4px 0;">Visualize your sustainability impact.</p></div>
+    <div style="display: flex; gap: 8px;">
+        <button class="pn-btn pn-btn-ghost" onclick="window.print()"><i class="bi bi-printer"></i> Export PDF</button>
+        <a href="?export=csv" class="pn-btn pn-btn-ghost"><i class="bi bi-file-earmark-spreadsheet"></i> CSV</a>
+    </div>
+</div>
+
+<div style="display: flex; gap: 8px; margin-bottom: 18px;">
+    <button class="pn-chip">Week</button>
+    <button class="pn-chip active">Month</button>
+    <button class="pn-chip">Year</button>
+    <button class="pn-chip">Custom</button>
+</div>
+
+<div class="pn-grid pn-grid-4" style="margin-bottom: 24px;">
+    <div class="pn-kpi success"><div class="pn-kpi-icon">💰</div><div class="pn-kpi-value">₹{{ total_saved }}</div><div class="pn-kpi-label">Money in Waste</div></div>
+    <div class="pn-kpi"><div class="pn-kpi-icon">🥦</div><div class="pn-kpi-value">{{ food_saved_kg }}</div><div class="pn-kpi-label">Food Saved (kg)</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-icon">🌍</div><div class="pn-kpi-value">{{ co2_reduced }}</div><div class="pn-kpi-label">CO₂ Reduced</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">📉</div><div class="pn-kpi-value">{{ waste_reduction }}%</div><div class="pn-kpi-label">Waste Reduction</div></div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div class="pn-card"><h3 class="pn-card-title">Waste by Category</h3>
+        {% if cat_labels %}<canvas id="cat" height="220"></canvas>{% else %}<div class="pn-empty"><div class="icon">📊</div><p>No data yet</p></div>{% endif %}
+    </div>
+    <div class="pn-card"><h3 class="pn-card-title">Monthly Item Trend</h3><canvas id="trend" height="220"></canvas></div>
+    <div class="pn-card"><h3 class="pn-card-title">Items: Added vs Consumed</h3><canvas id="cons" height="220"></canvas></div>
+    <div class="pn-card"><h3 class="pn-card-title">Cost Savings (₹/month)</h3><canvas id="cost" height="220"></canvas></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+{% if cat_labels %}
+new Chart(document.getElementById('cat'),{type:'pie',data:{labels:{{ cat_labels|safe }},datasets:[{data:{{ cat_data|safe }},backgroundColor:['#52B788','#1B4332','#F4A261','#E63946','#74C69D']}]},options:{responsive:true,maintainAspectRatio:false}});
+{% endif %}
+new Chart(document.getElementById('trend'),{type:'line',data:{labels:{{ monthly_labels|safe }},datasets:[{label:'Items',data:{{ monthly_data|safe }},borderColor:'#52B788',backgroundColor:'rgba(82,183,136,0.15)',fill:true,tension:0.4}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('cons'),{type:'bar',data:{labels:{{ consumed_labels|safe }},datasets:[{label:'Count',data:{{ consumed_data|safe }},backgroundColor:['#52B788','#1B4332','#F4A261'],borderRadius:6}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+new Chart(document.getElementById('cost'),{type:'bar',data:{labels:{{ cost_labels|safe }},datasets:[{label:'Cost',data:{{ cost_data|safe }},backgroundColor:'#E63946',borderRadius:6}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+</script>
+{% endblock %}

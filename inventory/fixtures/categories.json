@@ -1,0 +1,12 @@
+[
+  {"model": "inventory.category", "pk": 1, "fields": {"name": "Vegetables", "icon": "bi-flower1", "color_code": "#52B788"}},
+  {"model": "inventory.category", "pk": 2, "fields": {"name": "Fruits", "icon": "bi-apple", "color_code": "#E63946"}},
+  {"model": "inventory.category", "pk": 3, "fields": {"name": "Dairy", "icon": "bi-cup-straw", "color_code": "#74C69D"}},
+  {"model": "inventory.category", "pk": 4, "fields": {"name": "Meat", "icon": "bi-egg-fried", "color_code": "#E63946"}},
+  {"model": "inventory.category", "pk": 5, "fields": {"name": "Grains", "icon": "bi-basket3-fill", "color_code": "#F4A261"}},
+  {"model": "inventory.category", "pk": 6, "fields": {"name": "Spices", "icon": "bi-fire", "color_code": "#F4A261"}},
+  {"model": "inventory.category", "pk": 7, "fields": {"name": "Beverages", "icon": "bi-cup-hot-fill", "color_code": "#1B4332"}},
+  {"model": "inventory.category", "pk": 8, "fields": {"name": "Snacks", "icon": "bi-bag-fill", "color_code": "#F4A261"}},
+  {"model": "inventory.category", "pk": 9, "fields": {"name": "Frozen", "icon": "bi-snow", "color_code": "#74C69D"}},
+  {"model": "inventory.category", "pk": 10, "fields": {"name": "Other", "icon": "bi-three-dots", "color_code": "#6B7F6B"}}
+]

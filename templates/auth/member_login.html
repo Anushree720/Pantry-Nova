@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Family Member Login — Pantry Nova{% endblock %}
+
+{% block body %}
+<div class="pn-auth-centered">
+    <div class="pn-auth-card pn-card" style="padding: 36px; max-width: 460px;" id="loginForm">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3rem;">🌿</div>
+            <h2>Welcome Back</h2>
+            <p style="color: var(--pn-text-secondary);">Family member login</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="pn-form-group">
+                <label class="pn-form-label">Username</label>
+                <input class="pn-form-control" name="username" required autofocus>
+            </div>
+            <div class="pn-form-group">
+                <label class="pn-form-label">Password</label>
+                <div style="position: relative;">
+                    <input type="password" class="pn-form-control" name="password" id="pwField2" required>
+                    <button type="button" data-toggle-password="#pwField2" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--pn-text-secondary); cursor: pointer;"><i class="bi bi-eye"></i></button>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <label style="font-size: 0.9rem;"><input type="checkbox" name="remember"> Remember me</label>
+                <a href="{% url 'password_reset' %}" style="font-size: 0.9rem;">Forgot Password?</a>
+            </div>
+            <button class="pn-btn pn-btn-accent pn-btn-block" type="submit">Log In</button>
+        </form>
+
+        <p style="margin-top: 18px; text-align: center; color: var(--pn-text-secondary);">
+            New member? <a href="{% url 'member_register' %}">Join with code</a>
+        </p>
+        <p style="text-align: center;">
+            <a href="{% url 'manager_login' %}" style="font-size: 0.85rem;">I'm a Kitchen Manager</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

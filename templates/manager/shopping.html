@@ -1,0 +1,88 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div><h1 style="margin: 0;">Shopping List</h1><p style="color: var(--pn-text-secondary); margin: 4px 0;">{{ list_obj.name }} · {{ items|length }} items</p></div>
+    <div style="display: flex; gap: 8px;">
+        <button class="pn-btn pn-btn-ghost" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+        {% if list_obj %}
+        <a href="{% url 'manager_shopping_complete' list_obj.list_id %}" class="pn-btn pn-btn-accent" data-confirm="Mark all as purchased and start a new list?"><i class="bi bi-check-all"></i> Complete List</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div>
+        <div class="pn-card" style="margin-bottom: 18px;">
+            <h3 class="pn-card-title">Add Item</h3>
+            <form method="post" action="{% url 'manager_shopping_add' %}">
+                {% csrf_token %}
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Item Name</label><input class="pn-form-control" name="item_name" required></div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Category</label>
+                        <select class="pn-form-select" name="category">
+                            <option value="">— None —</option>
+                            {% for c in cats %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group"><label class="pn-form-label">Quantity</label><input type="number" step="0.01" class="pn-form-control" name="quantity" value="1" required></div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Unit</label>
+                        <select class="pn-form-select" name="unit">
+                            <option value="kg">kg</option><option value="g">g</option>
+                            <option value="L">L</option><option value="ml">ml</option>
+                            <option value="pcs" selected>pcs</option><option value="packets">packets</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-form-group"><label class="pn-form-label">Notes</label><input class="pn-form-control" name="notes"></div>
+                <button class="pn-btn pn-btn-accent pn-btn-block" type="submit"><i class="bi bi-plus-circle-fill"></i> Add to List</button>
+            </form>
+        </div>
+
+        {% if history %}
+        <div class="pn-card">
+            <h3 class="pn-card-title">📜 Shopping History</h3>
+            {% for h in history %}
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--pn-border);">
+                <span>{{ h.name }}</span>
+                <small class="text-muted">{{ h.created_at|date:"d M Y" }} · {{ h.items_count }} items</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="pn-card">
+        <h3 class="pn-card-title">🛒 Active List</h3>
+        {% if items %}
+            {% csrf_token %}
+            {% for i in items %}
+            <div class="shop-row {% if i.is_purchased %}pn-strike{% endif %}" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--pn-border);">
+                <input type="checkbox" data-shop-toggle="{{ i.item_id }}" {% if i.is_purchased %}checked{% endif %} style="width: 20px; height: 20px;">
+                <div style="flex: 1;">
+                    <strong>{{ i.item_name }}</strong>
+                    <div style="font-size: 0.82rem; color: var(--pn-text-secondary);">
+                        {{ i.quantity|floatformat:'-2' }} {{ i.unit }}
+                        {% if i.category %} · {{ i.category.name }}{% endif %}
+                        {% if i.notes %} · {{ i.notes|truncatechars:30 }}{% endif %}
+                    </div>
+                </div>
+                <a href="{% url 'manager_shopping_delete' i.item_id %}" class="pn-btn pn-btn-ghost pn-btn-sm" data-confirm="Remove?"><i class="bi bi-x"></i></a>
+            </div>
+            {% endfor %}
+            <div class="pn-divider"></div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a class="pn-btn pn-btn-accent pn-btn-sm" href="https://wa.me/?text=My%20Pantry%20Nova%20Shopping%20List" target="_blank"><i class="bi bi-whatsapp"></i> Share via WhatsApp</a>
+                <button class="pn-btn pn-btn-ghost pn-btn-sm" onclick="window.print()"><i class="bi bi-file-earmark-pdf"></i> Export PDF</button>
+            </div>
+        {% else %}
+            <div class="pn-empty"><div class="icon">🛒</div><p>List is empty. Add your first item!</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

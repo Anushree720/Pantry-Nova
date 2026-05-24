@@ -1,0 +1,90 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div><h1 style="margin: 0;">Ingredient References</h1><p style="color: var(--pn-text-secondary); margin: 4px 0;">Manage default shelf-life data for the platform.</p></div>
+    <button class="pn-btn pn-btn-accent" data-modal-open="ingredientModal" onclick="resetIngredientModal()">
+        <i class="bi bi-plus-circle-fill"></i> Add Ingredient
+    </button>
+</div>
+
+<div class="pn-card">
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>#</th><th>Ingredient</th><th>Category</th><th>Shelf Life (days)</th><th>Storage</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for i in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ i.ingredient_name }}</strong></td>
+                <td>{{ i.category.name|default:'—' }}</td>
+                <td><span class="pn-badge pn-badge-fresh">{{ i.default_shelf_life_days }} days</span></td>
+                <td><span class="pn-badge pn-badge-info">{{ i.get_storage_type_display }}</span></td>
+                <td>
+                    <button class="pn-btn pn-btn-ghost pn-btn-sm"
+                        data-edit-modal="ingredientModal"
+                        data-ref_id="{{ i.ref_id }}"
+                        data-ingredient_name="{{ i.ingredient_name }}"
+                        data-category="{{ i.category.id|default:'' }}"
+                        data-default_shelf_life_days="{{ i.default_shelf_life_days }}"
+                        data-storage_type="{{ i.storage_type }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <a href="{% url 'admin_ingredient_delete' i.ref_id %}" class="pn-btn pn-btn-danger pn-btn-sm" data-confirm="Delete this ingredient reference?"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pn-modal-overlay" id="ingredientModal">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3 id="ingTitle">Add Ingredient</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <form method="post" action="{% url 'admin_ingredient_save' %}">
+            {% csrf_token %}
+            <input type="hidden" name="ref_id" value="">
+            <div class="pn-modal-body">
+                <div class="pn-form-group"><label class="pn-form-label">Name</label><input class="pn-form-control" name="ingredient_name" required></div>
+                <div class="pn-grid pn-grid-2">
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Category</label>
+                        <select class="pn-form-select" name="category">
+                            <option value="">— Select —</option>
+                            {% for c in cats %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="pn-form-group">
+                        <label class="pn-form-label">Storage Type</label>
+                        <select class="pn-form-select" name="storage_type">
+                            <option value="fridge">Fridge</option>
+                            <option value="freezer">Freezer</option>
+                            <option value="pantry" selected>Pantry</option>
+                            <option value="counter">Counter</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pn-form-group">
+                    <label class="pn-form-label">Default Shelf Life (days)</label>
+                    <input type="number" class="pn-form-control" name="default_shelf_life_days" value="7" min="1">
+                </div>
+            </div>
+            <div class="pn-modal-footer">
+                <button type="button" class="pn-btn pn-btn-ghost" data-modal-close>Cancel</button>
+                <button type="submit" class="pn-btn pn-btn-accent">🌿 Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function resetIngredientModal(){
+    const m = document.getElementById('ingredientModal');
+    m.querySelector('input[name="ref_id"]').value = '';
+    m.querySelectorAll('input[type=text], input[type=number]').forEach(i => i.value = '');
+    m.querySelector('input[name="ingredient_name"]').value = '';
+    m.querySelector('input[name="default_shelf_life_days"]').value = '7';
+    document.getElementById('ingTitle').textContent = 'Add Ingredient';
+}
+</script>
+{% endblock %}

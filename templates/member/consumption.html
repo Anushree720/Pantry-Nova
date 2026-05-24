@@ -1,0 +1,64 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Log Consumption</h1>
+<p style="color: var(--pn-text-secondary);">Tell us what you've used so the family inventory stays accurate.</p>
+
+<div class="pn-grid pn-grid-2" style="margin-top: 18px;">
+    <div class="pn-card">
+        <h3 class="pn-card-title">🍽️ Quick Log</h3>
+        <form method="post" action="{% url 'member_consumption_log' %}">
+            {% csrf_token %}
+            <div class="pn-form-group">
+                <label class="pn-form-label">Select Item</label>
+                <select class="pn-form-select" name="item_id" required>
+                    <option value="">— Choose an item —</option>
+                    {% for it in items %}
+                    <option value="{{ it.item_id }}">{{ it.item_name }} ({{ it.quantity }} {{ it.unit }} available)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="pn-form-group">
+                <label class="pn-form-label">Quantity Used</label>
+                <input type="number" step="0.01" class="pn-form-control" name="quantity" value="1" required>
+            </div>
+            <div class="pn-form-group">
+                <label class="pn-form-label">Notes (optional)</label>
+                <textarea class="pn-form-control" name="notes" rows="2" placeholder="What did you make?"></textarea>
+            </div>
+            <button type="submit" class="pn-btn pn-btn-accent pn-btn-block">
+                <i class="bi bi-check-circle-fill"></i> Log Consumption
+            </button>
+        </form>
+    </div>
+
+    <div>
+        <div class="pn-card" style="margin-bottom: 18px;">
+            <h3 class="pn-card-title">⭐ Frequently Used</h3>
+            <div style="display: flex; flex-wrap: wrap;">
+                {% for f in frequent %}
+                <span class="pn-chip" onclick="document.querySelector('select[name=item_id]').value=document.querySelector('option[value][text=&quot;{{ f.item_name }}&quot;]')?.value">{{ f.item_name }}</span>
+                {% empty %}
+                <span style="color: var(--pn-text-secondary); padding: 8px;">No history yet</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="pn-card">
+            <h3 class="pn-card-title">📜 Recent Consumption</h3>
+            {% for h in history %}
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--pn-border);">
+                <div>
+                    <strong>{{ h.item_name }}</strong>
+                    <div style="font-size: 0.82rem; color: var(--pn-text-secondary);">{{ h.quantity }} {{ h.unit }}</div>
+                </div>
+                <small class="text-muted">{{ h.created_at|date:"d M" }}</small>
+            </div>
+            {% empty %}
+            <div class="pn-empty"><div class="icon">🍽️</div><p>No consumption logged yet</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

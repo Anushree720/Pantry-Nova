@@ -1,0 +1,76 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}
+{% if session_user_type == 'manager' %}{% include 'partials/manager_sidebar.html' %}
+{% else %}{% include 'partials/member_sidebar.html' %}{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="pn-chat-layout" style="border-radius: var(--pn-radius); overflow: hidden; box-shadow: var(--pn-shadow);">
+    <div class="pn-chat-sidebar">
+        <h3>🌿 Nova AI</h3>
+        <a href="{% url 'chatbot_new' %}" class="pn-btn pn-btn-accent pn-btn-block" style="margin-bottom: 16px;">
+            <i class="bi bi-plus-circle-fill"></i> New Chat
+        </a>
+        <div class="pn-chat-history">
+            <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.6; margin: 12px 0 8px;">History</div>
+            {% for s in sessions %}
+            <div class="pn-chat-history-item">Session {{ forloop.counter }}</div>
+            {% empty %}
+            <div style="font-size: 0.85rem; opacity: 0.7;">No previous chats</div>
+            {% endfor %}
+        </div>
+        <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; opacity: 0.65;">
+            Powered by Google Gemini
+        </div>
+    </div>
+
+    <div class="pn-chat-main">
+        <div class="pn-chat-header">
+            <div class="pn-chat-avatar">🌿</div>
+            <div>
+                <div style="font-weight: 600; font-family: 'Syne';">Nova — Pantry Assistant</div>
+                <div class="pn-chat-status">Online</div>
+            </div>
+        </div>
+
+        <div class="pn-chat-messages" id="chatMessages">
+            {% if not history %}
+            <div class="pn-chat-msg bot">
+                🌿 Hi {{ session_full_name|default:'there' }}! I'm Nova, your Pantry Nova AI assistant. I can help you with:
+                · Recipes for expiring ingredients
+                · Food storage tips
+                · Waste reduction strategies
+                · Smart shopping advice
+                · Nutritional information
+
+                What would you like to know today?
+            </div>
+            {% endif %}
+            {% for h in history %}
+            <div class="pn-chat-msg user">{{ h.message }}</div>
+            <div class="pn-chat-msg bot">{{ h.response }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="pn-chat-prompts">
+            <button class="pn-chat-prompt">What can I make with expiring items?</button>
+            <button class="pn-chat-prompt">Storage tips for vegetables</button>
+            <button class="pn-chat-prompt">How to reduce food waste?</button>
+            <button class="pn-chat-prompt">Weekly meal plan ideas</button>
+            <button class="pn-chat-prompt">Grocery shopping tips</button>
+        </div>
+
+        <form class="pn-chat-input-bar" id="chatForm">
+            {% csrf_token %}
+            <textarea id="chatInput" rows="1" placeholder="Ask Nova anything about your pantry..."></textarea>
+            <button type="submit" class="pn-chat-send-btn" title="Send">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+
+        <div style="background: rgba(244,162,97,0.1); color: #C97B3B; padding: 8px 20px; font-size: 0.78rem; border-top: 1px solid rgba(244,162,97,0.2);">
+            🌿 Nova provides general suggestions. Always check food safety guidelines for your specific situation.
+        </div>
+    </div>
+</div>
+{% endblock %}

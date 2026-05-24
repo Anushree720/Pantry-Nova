@@ -1,0 +1,24 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}
+{% if session_user_type == 'manager' %}{% include 'partials/manager_sidebar.html' %}
+{% else %}{% include 'partials/member_sidebar.html' %}{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>Chat History</h1>
+<p style="color: var(--pn-text-secondary);">Your conversations with Nova AI.</p>
+
+<div class="pn-card" style="margin-top: 18px;">
+    {% for c in sessions %}
+    <details style="padding: 12px; border-bottom: 1px solid var(--pn-border);">
+        <summary style="cursor: pointer; font-weight: 600;">{{ c.message|truncatechars:80 }} <small style="font-weight: 400; color: var(--pn-text-secondary);">· {{ c.timestamp|date:"d M Y H:i" }}</small></summary>
+        <div style="margin-top: 12px; padding: 12px; background: var(--pn-surface); border-radius: 10px;">
+            <strong>You:</strong> {{ c.message }}
+            <div style="margin-top: 10px;"><strong>🌿 Nova:</strong> {{ c.response|linebreaks }}</div>
+        </div>
+    </details>
+    {% empty %}
+    <div class="pn-empty"><div class="icon">💬</div><p>No conversations yet. <a href="{% url 'chatbot' %}">Start chatting with Nova!</a></p></div>
+    {% endfor %}
+</div>
+{% endblock %}

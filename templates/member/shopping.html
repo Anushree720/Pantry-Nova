@@ -1,0 +1,36 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Shopping List</h1>
+<p style="color: var(--pn-text-secondary);">Family shopping list — view and check off items as you shop.</p>
+
+<div style="display: flex; gap: 8px; margin: 18px 0;">
+    <button class="pn-btn pn-btn-ghost" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+</div>
+
+{% if list_obj %}
+    {% for cat, items in items_grouped.items %}
+    <div class="pn-card" style="margin-bottom: 16px;">
+        <h3 class="pn-card-title">{{ cat }} <small style="color: var(--pn-text-secondary); font-weight: 400;">({{ items|length }} items)</small></h3>
+        {% for i in items %}
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--pn-border);">
+            <input type="checkbox" style="width: 20px; height: 20px;" onchange="this.parentElement.classList.toggle('pn-strike', this.checked)">
+            <div style="flex: 1;">
+                <strong>{{ i.item_name }}</strong>
+                <div style="font-size: 0.82rem; color: var(--pn-text-secondary);">
+                    {{ i.quantity|floatformat:'-2' }} {{ i.unit }}
+                    {% if i.notes %} · {{ i.notes|truncatechars:40 }}{% endif %}
+                </div>
+            </div>
+            {% if i.is_purchased %}<span class="pn-badge pn-badge-fresh">Purchased</span>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% empty %}
+    <div class="pn-empty"><div class="icon">🛒</div><p>The shopping list is empty.</p></div>
+    {% endfor %}
+{% else %}
+<div class="pn-empty"><div class="icon">🛒</div><p>No active shopping list. The Kitchen Manager will create one soon.</p></div>
+{% endif %}
+{% endblock %}

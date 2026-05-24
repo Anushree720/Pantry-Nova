@@ -1,0 +1,115 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/manager_sidebar.html' %}{% endblock %}
+
+{% block content %}
+{% if expiring_today %}
+<div class="pn-alert-banner">
+    <i class="bi bi-exclamation-triangle-fill" style="font-size: 1.4rem;"></i>
+    <div><strong>{{ expiring_today }} item{{ expiring_today|pluralize }} expiring today!</strong> — Take action to avoid waste.</div>
+    <a href="{% url 'manager_expiry' %}" class="pn-btn pn-btn-sm" style="margin-left: auto; background: rgba(255,255,255,0.2); color: #fff;">View Now <i class="bi bi-arrow-right"></i></a>
+</div>
+{% endif %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+    <div>
+        <h1 style="margin: 0;">Welcome, {{ session_full_name }} 🌿</h1>
+        <p style="color: var(--pn-text-secondary); margin: 4px 0;">Here's your kitchen at a glance.</p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'manager_inventory' %}" class="pn-btn pn-btn-accent"><i class="bi bi-plus-circle-fill"></i> Add Item</a>
+        <a href="{% url 'manager_shopping' %}" class="pn-btn pn-btn-ghost"><i class="bi bi-cart-fill"></i> Shopping</a>
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-3" style="margin-bottom: 24px;">
+    <div class="pn-kpi"><div class="pn-kpi-icon">📦</div><div class="pn-kpi-value" data-counter="{{ total_items }}">0</div><div class="pn-kpi-label">Total Items</div></div>
+    <div class="pn-kpi danger pulse-red"><div class="pn-kpi-icon">⚠️</div><div class="pn-kpi-value" data-counter="{{ expiring_today }}">0</div><div class="pn-kpi-label">Expiring Today</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">🟠</div><div class="pn-kpi-value" data-counter="{{ expiring_week }}">0</div><div class="pn-kpi-label">Expiring This Week</div></div>
+    <div class="pn-kpi"><div class="pn-kpi-icon">📭</div><div class="pn-kpi-value" data-counter="{{ out_of_stock }}">0</div><div class="pn-kpi-label">Out of Stock</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-icon">👨‍👩‍👧</div><div class="pn-kpi-value" data-counter="{{ family_count }}">0</div><div class="pn-kpi-label">Family Members</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">♻️</div><div class="pn-kpi-value" data-counter="{{ waste_month }}">0</div><div class="pn-kpi-label">Waste This Month</div></div>
+</div>
+
+{# Expiry urgency progress bars #}
+<div class="pn-grid pn-grid-3" style="margin-bottom: 24px;">
+    <div class="pn-card" style="border-top-color: var(--pn-danger);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2rem;">🔴</div>
+            <div style="flex: 1;">
+                <div style="font-family: 'Syne'; font-size: 1.6rem; font-weight: 700;">{{ expired_count }}</div>
+                <div style="color: var(--pn-text-secondary); font-size: 0.85rem;">Already Expired</div>
+            </div>
+        </div>
+        <div class="pn-progress" style="margin-top: 10px;"><div class="pn-progress-bar danger" style="width: {% if total_items %}{% widthratio expired_count total_items 100 %}{% else %}0{% endif %}%;"></div></div>
+    </div>
+    <div class="pn-card" style="border-top-color: var(--pn-warning);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2rem;">🟠</div>
+            <div style="flex: 1;">
+                <div style="font-family: 'Syne'; font-size: 1.6rem; font-weight: 700;">{{ expiring_week }}</div>
+                <div style="color: var(--pn-text-secondary); font-size: 0.85rem;">Expiring in 7 Days</div>
+            </div>
+        </div>
+        <div class="pn-progress" style="margin-top: 10px;"><div class="pn-progress-bar warning" style="width: {% if total_items %}{% widthratio expiring_week total_items 100 %}{% else %}0{% endif %}%;"></div></div>
+    </div>
+    <div class="pn-card" style="border-top-color: var(--pn-accent);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2rem;">🟢</div>
+            <div style="flex: 1;">
+                <div style="font-family: 'Syne'; font-size: 1.6rem; font-weight: 700;">{{ fresh_count }}</div>
+                <div style="color: var(--pn-text-secondary); font-size: 0.85rem;">Fresh & Good</div>
+            </div>
+        </div>
+        <div class="pn-progress" style="margin-top: 10px;"><div class="pn-progress-bar" style="width: {% if total_items %}{% widthratio fresh_count total_items 100 %}{% else %}0{% endif %}%;"></div></div>
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-2" style="margin-bottom: 24px;">
+    <div class="pn-card">
+        <h3 class="pn-card-title">Inventory by Category</h3>
+        {% if cat_labels %}<canvas id="catChart" height="240"></canvas>{% else %}<div class="pn-empty"><div class="icon">📊</div><p>Add items to see categories</p></div>{% endif %}
+    </div>
+    <div class="pn-card">
+        <h3 class="pn-card-title">Recent Additions</h3>
+        {% for i in recent_items %}
+        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--pn-border);">
+            <div><strong>{{ i.item_name }}</strong> · <small class="text-muted">{{ i.quantity }} {{ i.unit }}</small></div>
+            <span class="pn-badge pn-badge-{{ i.expiry_color }}">{{ i.expiry_label }}</span>
+        </div>
+        {% empty %}
+        <div class="pn-empty"><div class="icon">📦</div><p>No items yet. <a href="{% url 'manager_inventory' %}">Add your first item</a></p></div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div class="pn-card">
+        <h3 class="pn-card-title">Waste Trend (7 days)</h3>
+        <canvas id="wasteChart" height="220"></canvas>
+    </div>
+    <div class="pn-card" style="background: linear-gradient(135deg, rgba(82,183,136,0.1) 0%, rgba(82,183,136,0.05) 100%);">
+        <h3 class="pn-card-title">🤖 Nova AI Suggests</h3>
+        {% if expiring_items %}
+        <p>You have {{ expiring_items|length }} item{{ expiring_items|length|pluralize }} expiring soon. Try this:</p>
+        <div style="background: var(--pn-card); padding: 16px; border-radius: 12px; border-left: 4px solid var(--pn-accent);">
+            <strong>🌿 Quick Stir-Fry</strong>
+            <p style="margin: 8px 0 0; font-size: 0.9rem;">Use {{ expiring_items.0.item_name }} and any other expiring veggies. Sauté with garlic, soy sauce, and ginger over rice.</p>
+        </div>
+        <a href="{% url 'chatbot' %}" class="pn-btn pn-btn-accent" style="margin-top: 12px;">
+            Ask Nova for more <i class="bi bi-arrow-right"></i>
+        </a>
+        {% else %}
+        <div class="pn-empty"><div class="icon">🌿</div><p>Your pantry looks great! No urgent expiries.</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+{% if cat_labels %}
+new Chart(document.getElementById('catChart'),{type:'doughnut',data:{labels:{{ cat_labels|safe }},datasets:[{data:{{ cat_data|safe }},backgroundColor:['#52B788','#1B4332','#F4A261','#E63946','#74C69D','#95B895','#6B7F6B']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
+{% endif %}
+new Chart(document.getElementById('wasteChart'),{type:'bar',data:{labels:{{ waste_labels|safe }},datasets:[{label:'Items',data:{{ waste_data|safe }},backgroundColor:'#F4A261',borderRadius:6}]},options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false}});
+</script>
+{% endblock %}

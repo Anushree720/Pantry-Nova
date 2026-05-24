@@ -1,0 +1,43 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Platform Feedback</h1>
+
+<div class="pn-grid pn-grid-2" style="margin: 18px 0;">
+    <div class="pn-kpi"><div class="pn-kpi-icon">💬</div><div class="pn-kpi-value" data-counter="{{ total_count }}">0</div><div class="pn-kpi-label">Total Feedback</div></div>
+    <div class="pn-kpi success"><div class="pn-kpi-icon" style="font-size: 2rem;">{{ top_emoji }}</div><div class="pn-kpi-value">{{ top_emoji }}</div><div class="pn-kpi-label">Top Reaction</div></div>
+</div>
+
+<div class="pn-card">
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>#</th><th>User</th><th>Feedback</th><th>Rating</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for f in items %}
+            <tr>
+                <td>{{ f.feedback_id }}</td>
+                <td>{{ f.user.username }}</td>
+                <td>{{ f.feedback_text|truncatechars:80 }}</td>
+                <td style="font-size: 1.4rem;">{{ f.emoji_rating|default:'🙂' }}</td>
+                <td>{{ f.feedback_date|date:"d M Y" }}</td>
+                <td><button class="pn-btn pn-btn-ghost pn-btn-sm" data-modal-open="fb{{ f.feedback_id }}"><i class="bi bi-eye"></i></button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% for f in items %}
+<div class="pn-modal-overlay" id="fb{{ f.feedback_id }}">
+    <div class="pn-modal">
+        <div class="pn-modal-header"><h3>Feedback #{{ f.feedback_id }}</h3><button class="pn-modal-close" data-modal-close>&times;</button></div>
+        <div class="pn-modal-body">
+            <div style="text-align: center; font-size: 4rem;">{{ f.emoji_rating|default:'🙂' }}</div>
+            <p style="text-align: center; color: var(--pn-text-secondary);">From {{ f.user.username }} · {{ f.feedback_date|date:"d M Y" }}</p>
+            <div style="padding: 16px; background: var(--pn-surface); border-radius: 10px;">{{ f.feedback_text }}</div>
+        </div>
+        <div class="pn-modal-footer"><button class="pn-btn pn-btn-ghost" data-modal-close>Close</button></div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

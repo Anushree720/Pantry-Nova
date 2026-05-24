@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login — Pantry Nova{% endblock %}
+
+{% block body %}
+<div style="min-height: 100vh; background: var(--pn-primary-dark); display: flex; align-items: center; justify-content: center; padding: 20px; background-image: radial-gradient(rgba(82, 183, 136, 0.08) 1px, transparent 1px); background-size: 30px 30px;">
+    <div class="pn-card" style="max-width: 420px; width: 100%; padding: 40px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="display: inline-block; background: var(--pn-primary); color: var(--pn-accent); padding: 6px 18px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Admin Portal</div>
+            <h2 style="margin-top: 16px;">🌿 Pantry Nova</h2>
+            <p style="color: var(--pn-text-secondary);">System administrator access</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="pn-form-group">
+                <label class="pn-form-label">Admin Username</label>
+                <input class="pn-form-control" name="username" required autofocus>
+            </div>
+            <div class="pn-form-group">
+                <label class="pn-form-label">Password</label>
+                <div style="position: relative;">
+                    <input type="password" class="pn-form-control" name="password" id="adminPw" required>
+                    <button type="button" data-toggle-password="#adminPw" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--pn-text-secondary); cursor: pointer;"><i class="bi bi-eye"></i></button>
+                </div>
+            </div>
+            <button class="pn-btn pn-btn-primary pn-btn-block" type="submit">
+                <i class="bi bi-shield-lock-fill"></i> Login to Admin
+            </button>
+        </form>
+
+        <p style="margin-top: 18px; text-align: center;">
+            <a href="{% url 'manager_login' %}" style="font-size: 0.85rem; color: var(--pn-text-secondary);">← Back to user login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/member_sidebar.html' %}{% endblock %}
+
+{% block content %}
+{% if alerts_pending %}
+<div class="pn-alert-banner">
+    <i class="bi bi-exclamation-triangle-fill" style="font-size: 1.4rem;"></i>
+    <div><strong>{{ alerts_pending }} item{{ alerts_pending|pluralize }} expired!</strong> — Please notify your Kitchen Manager.</div>
+    <a href="{% url 'member_alerts' %}" class="pn-btn pn-btn-sm" style="margin-left: auto; background: rgba(255,255,255,0.2); color: #fff;">View Alerts <i class="bi bi-arrow-right"></i></a>
+</div>
+{% endif %}
+
+<h1>Hello, {{ session_full_name }} 🌿</h1>
+<p style="color: var(--pn-text-secondary);">Here's the family kitchen at a glance.</p>
+
+<div class="pn-grid pn-grid-4" style="margin: 18px 0;">
+    <div class="pn-kpi success"><div class="pn-kpi-icon">📦</div><div class="pn-kpi-value" data-counter="{{ items_available }}">0</div><div class="pn-kpi-label">Items Available</div></div>
+    <div class="pn-kpi warning"><div class="pn-kpi-icon">🟠</div><div class="pn-kpi-value" data-counter="{{ expiring_soon }}">0</div><div class="pn-kpi-label">Expiring Soon</div></div>
+    <div class="pn-kpi"><div class="pn-kpi-icon">🍽️</div><div class="pn-kpi-value" data-counter="{{ my_consumption }}">0</div><div class="pn-kpi-label">My Consumption (Week)</div></div>
+    <div class="pn-kpi danger"><div class="pn-kpi-icon">🔔</div><div class="pn-kpi-value" data-counter="{{ alerts_pending }}">0</div><div class="pn-kpi-label">Alerts Pending</div></div>
+</div>
+
+<div class="pn-grid pn-grid-2">
+    <div class="pn-card">
+        <h3 class="pn-card-title">📦 Stock by Category</h3>
+        {% for c in cats|slice:":8" %}
+            {% if c.c %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--pn-border);">
+                <span><i class="bi {{ c.icon|default:'bi-egg-fried' }}" style="color: var(--pn-accent);"></i> {{ c.name }}</span>
+                <span class="pn-badge pn-badge-fresh">{{ c.c }} items</span>
+            </div>
+            {% endif %}
+        {% empty %}
+        <div class="pn-empty"><div class="icon">📦</div><p>No stock yet</p></div>
+        {% endfor %}
+    </div>
+
+    <div class="pn-card">
+        <h3 class="pn-card-title">🔔 Recent Expiry Alerts</h3>
+        {% for a in recent_alerts %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--pn-border);">
+            <div><strong>{{ a.item_name }}</strong><br><small style="color: var(--pn-text-secondary);">{{ a.quantity }} {{ a.unit }} · {{ a.expiry_date|date:"d M" }}</small></div>
+            <span class="pn-badge pn-badge-{{ a.expiry_color }}">{{ a.expiry_label }}</span>
+        </div>
+        {% empty %}
+        <div class="pn-empty"><div class="icon">✨</div><p>Pantry looks great!</p></div>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap;">
+    <a href="{% url 'member_alerts' %}" class="pn-btn pn-btn-warning"><i class="bi bi-bell-fill"></i> Check Alerts</a>
+    <a href="{% url 'member_consumption' %}" class="pn-btn pn-btn-accent"><i class="bi bi-cup-hot-fill"></i> Log Consumption</a>
+    <a href="{% url 'member_shopping' %}" class="pn-btn pn-btn-ghost"><i class="bi bi-cart-fill"></i> Shopping List</a>
+    <a href="{% url 'chatbot' %}" class="pn-btn pn-btn-primary"><i class="bi bi-robot"></i> Ask Nova</a>
+</div>
+{% endblock %}

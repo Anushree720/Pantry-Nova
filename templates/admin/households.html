@@ -1,0 +1,43 @@
+{% extends 'dashboard_base.html' %}
+{% block sidebar %}{% include 'partials/admin_sidebar.html' %}{% endblock %}
+
+{% block content %}
+<h1>Households</h1>
+<p style="color: var(--pn-text-secondary);">Verify, suspend or view registered households.</p>
+
+<div class="pn-card" style="margin-top: 18px;">
+    <table class="pn-table pn-datatable">
+        <thead><tr><th>#</th><th>Household</th><th>Type</th><th>City</th><th>Members</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for h in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ h.household_name }}</strong><br><small class="text-muted">Code: {{ h.join_code }}</small></td>
+                <td><span class="pn-badge pn-badge-info">{{ h.get_household_type_display }}</span></td>
+                <td>{{ h.city }}</td>
+                <td>{{ h.member_count }}</td>
+                <td>{{ h.item_count }}</td>
+                <td>
+                    {% if h.is_suspended %}
+                        <span class="pn-badge pn-badge-danger">Suspended</span>
+                    {% elif h.is_verified %}
+                        <span class="pn-badge pn-badge-fresh">Verified</span>
+                    {% else %}
+                        <span class="pn-badge pn-badge-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'admin_household_view' h.household_id %}" class="pn-btn pn-btn-ghost pn-btn-sm"><i class="bi bi-eye"></i></a>
+                    {% if not h.is_verified %}
+                    <a href="{% url 'admin_household_verify' h.household_id %}" class="pn-btn pn-btn-accent pn-btn-sm" data-confirm="Verify this household?"><i class="bi bi-check-lg"></i></a>
+                    {% endif %}
+                    {% if not h.is_suspended %}
+                    <a href="{% url 'admin_household_suspend' h.household_id %}" class="pn-btn pn-btn-danger pn-btn-sm" data-confirm="Suspend this household?"><i class="bi bi-x-lg"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+[
+  {"model": "admin_panel.ingredientreference", "pk": 1, "fields": {"ingredient_name": "Tomatoes", "category": 1, "default_shelf_life_days": 7, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 2, "fields": {"ingredient_name": "Onions", "category": 1, "default_shelf_life_days": 30, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 3, "fields": {"ingredient_name": "Potatoes", "category": 1, "default_shelf_life_days": 21, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 4, "fields": {"ingredient_name": "Spinach", "category": 1, "default_shelf_life_days": 5, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 5, "fields": {"ingredient_name": "Carrots", "category": 1, "default_shelf_life_days": 21, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 6, "fields": {"ingredient_name": "Apples", "category": 2, "default_shelf_life_days": 14, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 7, "fields": {"ingredient_name": "Bananas", "category": 2, "default_shelf_life_days": 7, "storage_type": "counter", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 8, "fields": {"ingredient_name": "Oranges", "category": 2, "default_shelf_life_days": 14, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 9, "fields": {"ingredient_name": "Milk", "category": 3, "default_shelf_life_days": 7, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 10, "fields": {"ingredient_name": "Yogurt", "category": 3, "default_shelf_life_days": 14, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 11, "fields": {"ingredient_name": "Cheese", "category": 3, "default_shelf_life_days": 21, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 12, "fields": {"ingredient_name": "Chicken", "category": 4, "default_shelf_life_days": 3, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 13, "fields": {"ingredient_name": "Mutton", "category": 4, "default_shelf_life_days": 3, "storage_type": "fridge", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 14, "fields": {"ingredient_name": "Rice", "category": 5, "default_shelf_life_days": 365, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 15, "fields": {"ingredient_name": "Wheat Flour", "category": 5, "default_shelf_life_days": 180, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 16, "fields": {"ingredient_name": "Lentils (Dal)", "category": 5, "default_shelf_life_days": 365, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 17, "fields": {"ingredient_name": "Turmeric", "category": 6, "default_shelf_life_days": 730, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 18, "fields": {"ingredient_name": "Black Pepper", "category": 6, "default_shelf_life_days": 730, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 19, "fields": {"ingredient_name": "Tea Leaves", "category": 7, "default_shelf_life_days": 365, "storage_type": "pantry", "created_at": "2026-01-01T00:00:00Z"}},
+  {"model": "admin_panel.ingredientreference", "pk": 20, "fields": {"ingredient_name": "Bread", "category": 5, "default_shelf_life_days": 5, "storage_type": "counter", "created_at": "2026-01-01T00:00:00Z"}}
+]
