@@ -35,7 +35,7 @@ def dashboard(request):
         month_start = (today.replace(day=1) - timedelta(days=30*i)).replace(day=1)
         next_month = (month_start + timedelta(days=32)).replace(day=1)
         count = PantryItem.objects.filter(
-            created_at__gte=month_start, created_at__lt=next_month
+            created_at__date__gte=month_start, created_at__date__lt=next_month
         ).count()
         items_chart_labels.append(month_start.strftime('%b %Y'))
         items_chart_data.append(count)

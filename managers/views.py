@@ -414,7 +414,7 @@ def analytics(request):
     for i in range(5, -1, -1):
         mstart = (today.replace(day=1) - timedelta(days=30*i)).replace(day=1)
         mend = (mstart + timedelta(days=32)).replace(day=1)
-        c = pantry_items.filter(created_at__gte=mstart, created_at__lt=mend).count()
+        c = pantry_items.filter(created_at__date__gte=mstart, created_at__date__lt=mend).count()
         monthly_labels.append(mstart.strftime('%b'))
         monthly_data.append(c)
 
